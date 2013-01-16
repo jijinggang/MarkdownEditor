@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+
+Debug
+Release
+ipch
+*.suo
+*.sdf
+*.aps
