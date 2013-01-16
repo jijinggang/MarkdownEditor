@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="sundown">
+      <UniqueIdentifier>{fbe8a3ec-e5b9-48de-acea-b1ca1b4ace35}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="MarkdownEditor.reg" />
+    <None Include="res\MarkdownEditor.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\MarkdownEditorDoc.ico">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\MarkdownEditor.ico">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\user.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MarkdownEditor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MarkdownEditorDoc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MarkdownEditorView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LeftView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MySplitterWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MarkdownEditor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MarkdownEditorDoc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MarkdownEditorView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LeftView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\autolink.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\stack.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\markdown.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\buffer.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\html_smartypants.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\html.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\houdini_html_e.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="sundown\houdini_href_e.c">
+      <Filter>sundown</Filter>
+    </ClCompile>
+    <ClCompile Include="MySplitterWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MarkdownEditor.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
