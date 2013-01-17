@@ -1,7 +1,7 @@
 MarkdownEditor
 ==============
 
-Lightweight markdown editor written by c++ , for windows user. Only one exe file, and need not any other modules.
+Lightweight markdown editor/viewer written by c++ , for windows user. It's a green software, only one exe file, and need not any other modules.
 
 
 Download
@@ -11,4 +11,8 @@ Download
 
 Usage
 -----
-You can replace default css style, please copy your markdown css file into the directory of MarkdownEditor, then rename to `user.css` 
+MarkdownEditor DON'T need any config by default. You can replace default css style, please copy your markdown css file into the directory of MarkdownEditor, then rename to `user.css` 
+
+Thanks
+------
+<https://github.com/vmg/sundown>
