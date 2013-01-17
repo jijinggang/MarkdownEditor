@@ -113,16 +113,67 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
         SafeArrayDestroy(pSA);                      // Finished with the safearray
 }
 
-
-void CMarkdownEditorView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/)
+CComPtr<IHTMLTextContainer> getContainer(IDispatch* pDisp){
+	if(NULL == pDisp)
+		return NULL;
+		CComPtr<IHTMLDocument2> pDocument2 = NULL; 
+            if (S_OK == pDisp->QueryInterface(IID_IHTMLDocument2, (LPVOID*)&pDocument2)) 
+            { 
+                CComPtr<IHTMLElement> pElement = NULL; 
+                if (S_OK == pDocument2->get_body(&pElement)) 
+                { 
+                    CComPtr<IHTMLTextContainer> pTextContainer = NULL; 
+                    if (S_OK == pElement->QueryInterface(IID_IHTMLTextContainer, (LPVOID*)&pTextContainer)) 
+                    { 
+						return pTextContainer;
+                    } 
+                }                 
+           } 
+		return NULL;
+}
+long getScrollTop(IDispatch* pDisp)
+{
+    long scrollTop;
+	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
+    if (pTextContainer &&  S_OK == pTextContainer->get_scrollTop(&scrollTop) ) 
+    {
+		return scrollTop ;
+    } 
+	return 0;
+}
+void setScrollTop(IDispatch* pDisp, long scrollTop)
+{
+	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
+    if (pTextContainer)
+    {
+		long top,height;
+		pTextContainer->get_scrollTop(&top);
+		pTextContainer->get_scrollHeight(&height);
+		pTextContainer->put_scrollTop(scrollTop);
+    } 
+}
+void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*/)
 {
 	if(_bFirstNavigate){
 		_bFirstNavigate = false;
 		Navigate2(_T("about:blank"),NULL,NULL);
 	}
-
+	long scrollTop = 0;
+	IDispatch* pDisp =GetHtmlDocument();
+	
+	if(pSender != NULL){
+		scrollTop = getScrollTop(pDisp);
+	}
 	const string& str = GetDocument()->getText();	
+
 	UpdateMd(str);
+
+	if(pSender != NULL){
+		setScrollTop(pDisp,scrollTop);
+	}
+
+
+
 	// TODO: 在此添加专用代码和/或调用基类
 }
 
@@ -159,3 +210,5 @@ void CMarkdownEditorView::UpdateMd(const string& strMd)
 	string strHtml = GetMdHtml(strMd);
 	NavigateHTML(strHtml);
 }
+
+

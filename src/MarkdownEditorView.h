@@ -49,6 +49,8 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
+public:
+//	virtual void OnNavigateComplete2(LPCTSTR strURL);
 };
 
 #ifndef _DEBUG  // MarkdownEditorView.cpp 中的调试版本
