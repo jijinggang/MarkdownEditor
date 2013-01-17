@@ -9,9 +9,12 @@ using namespace std;
 class CMarkdownEditorView : public CHtmlView
 {
 private:
+	bool _bFirstNavigate;
 	string _strCSS;
 	void initCSS();
 	string GetMdHtml(const string& str);
+public:
+	void UpdateMd(const string& strMd);
 
 private:
 	void NavigateHTML(const string& szHtml);
@@ -46,9 +49,6 @@ protected:
 protected:
 	DECLARE_MESSAGE_MAP()
 	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
-public:
-	afx_msg void OnAppAbout();
-	void UpdateMd(const string& strMd);
 };
 
 #ifndef _DEBUG  // MarkdownEditorView.cpp 中的调试版本

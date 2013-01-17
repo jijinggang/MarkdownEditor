@@ -23,6 +23,7 @@
 IMPLEMENT_DYNCREATE(CMarkdownEditorDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CMarkdownEditorDoc, CDocument)
+
 END_MESSAGE_MAP()
 
 
@@ -161,4 +162,3 @@ void CMarkdownEditorDoc::resetData(void)
 {
 	_strText = "";
 }
-

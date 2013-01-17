@@ -29,7 +29,7 @@ void CMySplitterWnd::ShowLeft(bool bShow){
 	CRect rect;
 	GetWindowRect(&rect);
 	if(bShow){
-		this->SetColumnInfo(0,_leftPercent*rect.Width(),10);
+		this->SetColumnInfo(0,(int)(_leftPercent*rect.Width()),10);
 	}else{
 		int cxCur, cxMin;
 		this->GetColumnInfo(0, cxCur, cxMin); 

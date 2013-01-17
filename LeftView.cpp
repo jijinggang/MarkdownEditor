@@ -36,8 +36,11 @@ CLeftView::~CLeftView()
 
 BOOL CLeftView::PreCreateWindow(CREATESTRUCT& cs)
 {
+	BOOL bCreate = CEditView::PreCreateWindow(cs);
+	cs.style &= ~(ES_AUTOHSCROLL|WS_HSCROLL);	// Enable word-wrapping
+	return bCreate;
 	// TODO: 在此处通过修改 CREATESTRUCT cs 来修改窗口类或样式
-	return CEditView::PreCreateWindow(cs);
+	//return CEditView::PreCreateWindow(cs);
 }
 
 void CLeftView::OnInitialUpdate()
@@ -104,6 +107,6 @@ int CLeftView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	_font.CreatePointFont(110,(LPCTSTR)"Consolas"); 
 	SetFont(&_font); 
 	this->SetTabStops(16);
-	this->ShowScrollBar(SB_HORZ,FALSE);
+	//this->ShowScrollBar(SB_HORZ,FALSE);
 	return 0;
 }

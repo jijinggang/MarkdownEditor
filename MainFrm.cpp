@@ -21,6 +21,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_COMMAND(IDM_SWITCH, &CMainFrame::OnSwitch)
+	ON_COMMAND(IDM_ABOUT, &CMainFrame::OnAbout)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -123,12 +124,25 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	
 
 	m_wndSplitter.SetColumnInfo(0,cx/2,10);
-	// TODO: 在此处添加消息处理程序代码
+	m_wndSplitter.RecalcLayout();
 }
 
 
 void CMainFrame::OnSwitch(){
 	_bShowLeft = !_bShowLeft;
 	m_wndSplitter.ShowLeft(_bShowLeft);
+
+}
+
+
+
+const string STR_ABOUT = "#MarkdownEditor 1.0\nProject: <https://github.com/jijinggang/MarkdownEditor>\n##Author\njijinggang@gmail.com\n##Copyright\nFree For All";
+//注意，此相应函数必须放在MainFrame中，如果放在MarkdownEditorView中，如果MarkdownEditorView失去焦点，则菜单不能点
+void CMainFrame::OnAbout()
+{
+	CMarkdownEditorView* pView = dynamic_cast<CMarkdownEditorView*>(m_wndSplitter.GetPane(0,1));
+	if(pView == NULL)
+		return;
+	pView->UpdateMd(STR_ABOUT);
 
 }

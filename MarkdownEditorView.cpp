@@ -23,7 +23,6 @@
 IMPLEMENT_DYNCREATE(CMarkdownEditorView, CHtmlView)
 
 BEGIN_MESSAGE_MAP(CMarkdownEditorView, CHtmlView)
-	ON_COMMAND(IDM_ABOUT, &CMarkdownEditorView::OnAppAbout)
 END_MESSAGE_MAP()
 
 // CMarkdownEditorView 构造/析构
@@ -31,6 +30,7 @@ END_MESSAGE_MAP()
 CMarkdownEditorView::CMarkdownEditorView()
 {
 	// TODO: 在此处添加构造代码
+	_bFirstNavigate = true;
 	initCSS();
 }
 
@@ -50,7 +50,6 @@ void CMarkdownEditorView::OnInitialUpdate()
 {
 	CHtmlView::OnInitialUpdate();
 
-	Navigate2(_T("about:blank"),NULL,NULL);
 }
 
 
@@ -117,6 +116,11 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 
 void CMarkdownEditorView::OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/)
 {
+	if(_bFirstNavigate){
+		_bFirstNavigate = false;
+		Navigate2(_T("about:blank"),NULL,NULL);
+	}
+
 	const string& str = GetDocument()->getText();	
 	UpdateMd(str);
 	// TODO: 在此添加专用代码和/或调用基类
@@ -147,12 +151,7 @@ string CMarkdownEditorView::GetMdHtml(const string& str){
 	replaceStr(strHtml, "{{1}}", Util::Text2Md(str));
 	return strHtml;
 }
-const string STR_ABOUT = "#MarkdownEditor 1.0\nProject: <https://github.com/jijinggang/MarkdownEditor>\n##Author\njijinggang@gmail.com\n##Copyright\nFree For All";
-void CMarkdownEditorView::OnAppAbout()
-{
-	// TODO: 在此添加命令处理程序代码
-	UpdateMd(STR_ABOUT);
-}
+
 
 
 void CMarkdownEditorView::UpdateMd(const string& strMd)

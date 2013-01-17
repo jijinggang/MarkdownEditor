@@ -10,7 +10,7 @@ public:
 private :
 	int _cx;
 	int _cy;
-	float _leftPercent;
+	double _leftPercent;
 	void ShowSplitter(bool bShow);
 public:
 	void ShowLeft(bool bShow);

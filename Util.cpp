@@ -74,7 +74,7 @@ CString Util::ReadStringFile(LPCTSTR strFileName)
 		if(uRead < MAX_BUFF)
 			break;
 	}
-	return Util::ANSIToUTF8(strRst).c_str();
+	return Util::UTF8ToANSI(strRst).c_str();
 }
 
 
