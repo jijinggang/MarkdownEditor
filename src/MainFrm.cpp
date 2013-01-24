@@ -122,7 +122,10 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	if(!_bInited)
 		return;
 	
-
+	int cxCur, cxMin;
+	m_wndSplitter.GetColumnInfo(0, cxCur, cxMin); 
+	if(cxCur <= 0)
+		return;
 	m_wndSplitter.SetColumnInfo(0,cx/2,10);
 	m_wndSplitter.RecalcLayout();
 }
