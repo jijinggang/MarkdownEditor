@@ -121,7 +121,8 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	CFrameWnd::OnSize(nType, cx, cy);
 	if(!_bInited)
 		return;
-	
+	if(cx == 0 || cy == 0)
+		return;
 	int cxCur, cxMin;
 	m_wndSplitter.GetColumnInfo(0, cxCur, cxMin); 
 	if(cxCur <= 0)
