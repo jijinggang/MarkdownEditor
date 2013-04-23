@@ -39,9 +39,8 @@ string Util::Text2Md(const string& str){
 	int ret;
 
 	ob = bufnew(OUTPUT_UNIT);
-
 	sdhtml_renderer(&callbacks, &options, 0);
-	markdown = sd_markdown_new(0, 16, &callbacks, &options);
+	markdown = sd_markdown_new(MKDEXT_TABLES|MKDEXT_AUTOLINK, 16, &callbacks, &options);
 
 	sd_markdown_render(ob, (const uint8_t*)(str.c_str()), str.size(), markdown);
 	//sd_markdown_render(ob, ib->data, ib->size, markdown);

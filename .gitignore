@@ -18,3 +18,4 @@ ipch
 *.suo
 *.sdf
 *.aps
+/download/MarkdownEditor.exe
