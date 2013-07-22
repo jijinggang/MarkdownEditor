@@ -152,9 +152,12 @@ void CMarkdownEditorDoc::Dump(CDumpContext& dc) const
 
 // CMarkdownEditorDoc 命令
 //更新文本内容
-void CMarkdownEditorDoc::UpdateText(const string& text, CView* pSender){
+void CMarkdownEditorDoc::UpdateText(const string& text, CView* pSender, bool bMoveToEnd){
 	_strText = text;
-	this->UpdateAllViews(pSender);
+	LPARAM lParam = 0;
+	if(bMoveToEnd)
+		lParam = 1;
+	this->UpdateAllViews(pSender, lParam);
 	this->SetModifiedFlag();
 }
 

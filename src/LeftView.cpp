@@ -84,8 +84,16 @@ void CLeftView::OnEnChange()
 	CString str;
 	this->GetWindowText(str);
 	string strText(str.GetBuffer());
-	GetDocument()->UpdateText(strText, this);
+	
+	bool bMoveToEnd = false;
+	int iStart, iEnd;
+	this->GetEditCtrl().GetSel(iStart, iEnd);
+	if(iEnd >= str.GetLength() - 1){
+		bMoveToEnd = true;
+	}
+	GetDocument()->UpdateText(strText, this, bMoveToEnd);
 	GetEditCtrl().SetFocus();
+
 }
 
 

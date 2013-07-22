@@ -131,17 +131,19 @@ CComPtr<IHTMLTextContainer> getContainer(IDispatch* pDisp){
            } 
 		return NULL;
 }
-long getScrollTop(IDispatch* pDisp)
+float getScrollTop(IDispatch* pDisp)
 {
     long scrollTop;
 	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
     if (pTextContainer &&  S_OK == pTextContainer->get_scrollTop(&scrollTop) ) 
     {
-		return scrollTop ;
+		long height;
+		pTextContainer->get_scrollHeight(&height);
+		return ((float)scrollTop)/height ;
     } 
-	return 0;
+	return 0.0;
 }
-void setScrollTop(IDispatch* pDisp, long scrollTop)
+void setScrollTop(IDispatch* pDisp, float scrollPercent)
 {
 	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
     if (pTextContainer)
@@ -149,16 +151,16 @@ void setScrollTop(IDispatch* pDisp, long scrollTop)
 		long top,height;
 		pTextContainer->get_scrollTop(&top);
 		pTextContainer->get_scrollHeight(&height);
-		pTextContainer->put_scrollTop(scrollTop);
+		pTextContainer->put_scrollTop(scrollPercent * height);
     } 
 }
-void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*/)
+void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObject* /*pHint*/)
 {
 	if(_bFirstNavigate){
 		_bFirstNavigate = false;
 		Navigate2(_T("about:blank"),NULL,NULL);
 	}
-	long scrollTop = 0;
+	float scrollTop = 0;
 	IDispatch* pDisp =GetHtmlDocument();
 	
 	if(pSender != NULL){
@@ -167,7 +169,9 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*
 	const string& str = GetDocument()->getText();	
 
 	UpdateMd(str);
-
+	if(lParam == 1){
+		scrollTop = 1.0;
+	}
 	if(pSender != NULL){
 		setScrollTop(pDisp,scrollTop);
 	}

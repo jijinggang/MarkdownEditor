@@ -11,7 +11,7 @@ class CMarkdownEditorDoc : public CDocument
 private:
 	string _strText;
 public:
-	void UpdateText(const string& text,  CView* pSender = NULL);
+	void UpdateText(const string& text,  CView* pSender = NULL, bool bMoveToEnd = false);
 	const string& getText(){return _strText;} 
 
 protected: // 仅从序列化创建
