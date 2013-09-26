@@ -76,6 +76,8 @@ void CMarkdownEditorDoc::Serialize(CArchive& ar)
 		}
 
 		_strText = Util::UTF8ToANSI(str);
+		Util::ReplaceAllStr(_strText,"\r\n", "\n");
+		Util::ReplaceAllStr(_strText,"\n", "\r\n");
 		this->UpdateAllViews(NULL);
 		// TODO: 在此添加加载代码
 	}

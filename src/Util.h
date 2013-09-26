@@ -18,5 +18,6 @@ public:
 	static char * UnicodeToUTF8( const wchar_t *str );
 	static string ANSIToUTF8(const char* str);
 	static string UTF8ToANSI(const char* str);
+	static string&  ReplaceAllStr(string& str,const string& old_value,const string&   new_value);
 };
 

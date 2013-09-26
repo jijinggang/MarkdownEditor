@@ -193,21 +193,12 @@ void CMarkdownEditorView::initCSS(){
 
 const string HTML_TMPL = "<html><head><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
 
-void replaceStr(string& str, const string& src, const string& dest){
-	int iFind = str.find(src);
-	if(iFind >= 0){
-		str.replace(iFind, src.length(), dest);
-	}
-}
-
 string CMarkdownEditorView::GetMdHtml(const string& str){
 	string strHtml = HTML_TMPL;
-	replaceStr(strHtml,"{{0}}", _strCSS);
-	replaceStr(strHtml, "{{1}}", Util::Text2Md(str));
+	Util::ReplaceAllStr(strHtml,"{{0}}", _strCSS);
+	Util::ReplaceAllStr(strHtml, "{{1}}", Util::Text2Md(str));
 	return strHtml;
 }
-
-
 
 void CMarkdownEditorView::UpdateMd(const string& strMd)
 {
