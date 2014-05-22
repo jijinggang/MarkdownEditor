@@ -40,7 +40,7 @@ string Util::Text2Md(const string& str){
 
 	ob = bufnew(OUTPUT_UNIT);
 	sdhtml_renderer(&callbacks, &options, 0);
-	markdown = sd_markdown_new(MKDEXT_TABLES|MKDEXT_AUTOLINK, 16, &callbacks, &options);
+	markdown = sd_markdown_new(MKDEXT_NO_INTRA_EMPHASIS|MKDEXT_TABLES|MKDEXT_AUTOLINK|MKDEXT_FENCED_CODE|MKDEXT_STRIKETHROUGH|MKDEXT_SPACE_HEADERS|MKDEXT_SUPERSCRIPT|MKDEXT_LAX_SPACING, 16, &callbacks, &options);
 
 	sd_markdown_render(ob, (const uint8_t*)(str.c_str()), str.size(), markdown);
 	//sd_markdown_render(ob, ib->data, ib->size, markdown);
@@ -60,23 +60,24 @@ string Util::Text2Md(const string& str){
 
 const int MAX_BUFF = 102400;
 
-CString Util::ReadStringFile(LPCTSTR strFileName)
+string Util::ReadStringFile(CFile& file){
+	int len = (int)file.GetLength();
+	char* buf = new char[len + 2];
+	buf[len] = 0;
+	buf[len + 1] = 0;
+	file.Read(buf,len);
+	string str = Util::AnyToANSI(buf, len);
+	delete []buf;
+	return str;
+}
+
+string Util::ReadStringFile(LPCTSTR strFileName)
 {
 	CFile file;
 	if(!file.Open(strFileName, CFile::modeRead))
 		return "";
-	CString strRst;
-	TCHAR buff[MAX_BUFF] = {0};
-	while(true){
-		UINT uRead = file.Read(buff,MAX_BUFF);
-		strRst.Append(buff , uRead);
-		if(uRead < MAX_BUFF)
-			break;
-	}
-	return Util::UTF8ToANSI(strRst).c_str();
+	return ReadStringFile(file);
 }
-
-
 
 BOOL Util::WriteStringFile(LPCTSTR strFileName, CString& strContent)
 {
@@ -101,7 +102,7 @@ bool Util::LoadStringRes(int idRes, LPCTSTR lpszType, string& strResult)
 		memcpy(szMsg, pData, nLength);
 		szMsg[nLength] = '\0';
 		UnlockResource(pData);
-		strResult = Util::UTF8ToANSI(szMsg) ;
+		strResult = Util::AnyToANSI(szMsg,nLength) ;
 		delete []szMsg;
 		return true;
 	return false;
@@ -179,3 +180,65 @@ string&  Util::ReplaceAllStr(string& str,const string& old_value,const string&  
     }   
     return   str;   
 }   
+
+int Util::IsTextUTF8(const char* str,long length)
+{
+	int i;
+	int nBytes=0;//UFT8可用1-6个字节编码,ASCII用一个字节
+	unsigned char chr;
+	bool bAllAscii=true; //如果全部都是ASCII, 说明不是UTF-8
+	for(i=0;i<length;i++)
+	{
+		chr= *(str+i);
+		if( (chr&0x80) != 0 ) // 判断是否ASCII编码,如果不是,说明有可能是UTF-8,ASCII用7位编码,但用一个字节存,最高位标记为0,o0xxxxxxx
+			bAllAscii= false;
+		if(nBytes==0) //如果不是ASCII码,应该是多字节符,计算字节数
+		{
+			if(chr>=0x80)
+			{
+				if(chr>=0xFC&&chr<=0xFD)
+					nBytes=6;
+				else if(chr>=0xF8)
+					nBytes=5;
+				else if(chr>=0xF0)
+					nBytes=4;
+				else if(chr>=0xE0)
+					nBytes=3;
+				else if(chr>=0xC0)
+					nBytes=2;
+				else
+				{
+					return false;
+				}
+				nBytes--;
+			}
+		}
+		else //多字节符的非首字节,应为 10xxxxxx
+		{
+			if( (chr&0xC0) != 0x80 )
+			{
+				return false;
+			}
+			nBytes--;
+		}
+	}
+
+	if( nBytes > 0 ) //违返规则
+	{
+		return false;
+	}
+
+	if( bAllAscii ) //如果全部都是ASCII, 说明不是UTF-8
+	{
+		return false;
+	}
+	return true;
+}
+
+string Util::AnyToANSI(const char* str, int len){
+	if(IsTextUTF8(str, len)){
+		return UTF8ToANSI(str);
+	}else{
+		return str;
+	}
+}

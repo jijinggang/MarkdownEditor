@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "./Util.h"
+#include <memory>
 // SHARED_HANDLERS 可以在实现预览、缩略图和搜索筛选器句柄的
 // ATL 项目中进行定义，并允许与该项目共享文档代码。
 #ifndef SHARED_HANDLERS
@@ -64,18 +65,9 @@ void CMarkdownEditorDoc::Serialize(CArchive& ar)
 	}
 	else
 	{
-		CString str;
-		const int BUF_SIZE = 64*1024;
-		unsigned char buf[BUF_SIZE + 1];
-		while(true){
-			UINT uRead = ar.Read(buf, BUF_SIZE);
-			buf[uRead] = '\0';
-			str += (const char*)buf;
-			if(uRead < BUF_SIZE)
-				break;
-		}
+		
+		_strText = Util::ReadStringFile(*ar.GetFile());
 
-		_strText = Util::UTF8ToANSI(str);
 		Util::ReplaceAllStr(_strText,"\r\n", "\n");
 		Util::ReplaceAllStr(_strText,"\n", "\r\n");
 		this->UpdateAllViews(NULL);
