@@ -97,10 +97,10 @@ void CLeftView::OnEnChange()
 }
 
 
-void CLeftView::OnUpdate(CView* pSender, LPARAM /*lHint*/, CObject* /*pHint*/)
+void CLeftView::OnUpdate(CView* pSender, LPARAM lHint, CObject* /*pHint*/)
 {
 	// TODO: 在此添加专用代码和/或调用基类
-	if(pSender == this)
+	if(pSender == this || !(lHint & LPARAM_Update))
 		return;
 	GetEditCtrl().SetWindowText(GetDocument()->getText().c_str());
 }

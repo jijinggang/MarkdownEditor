@@ -6,6 +6,11 @@
 #pragma once
 #include <string>
 using namespace std;
+enum {
+	LPARAM_Update = 0x1,
+	LPARAM_MoveEnd = 0x10,
+};
+	 
 class CMarkdownEditorDoc : public CDocument
 {
 private:

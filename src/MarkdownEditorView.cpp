@@ -86,31 +86,24 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 	HRESULT hr = pDoc ->QueryInterface(IID_IHTMLDocument2, (void**)&pHtmlDoc);
     if (FAILED(hr))
         return;
-
- // Empty URL and parameters opens the current document
-        CComBSTR    bstrURL;
-        CComVariant varDummy;
-        pHtmlDoc->open(bstrURL, varDummy, varDummy, varDummy, NULL);
-
-        // Create a safearray to store the HTML text
-        SAFEARRAY      *pSA;
-        SAFEARRAYBOUND  saBound = {1, 0};
-        pSA = SafeArrayCreate(VT_VARIANT, 1, &saBound);
-
-        // Copy the HTML into the one and only element
-        VARIANT   *pVar;
-        CComBSTR   bstrHTML = strHtml.c_str();              // Load the text
-        varDummy = bstrHTML;                        // .. into a variant
-
-        SafeArrayAccessData(pSA, (void**)&pVar);    // Access safearray data
-        pVar[0] = varDummy;                         // Set the text data
-        SafeArrayUnaccessData(pSA);                 // Release access
-
-        // Write the HTML as the document's new text
-        pHtmlDoc->write(pSA);                           // Overwrite HTML
-        pHtmlDoc->close();                              // Update browser
-
-        SafeArrayDestroy(pSA);                      // Finished with the safearray
+	BSTR bstr = _com_util::ConvertStringToBSTR(strHtml.c_str());
+	// Creates a new one-dimensional array
+	SAFEARRAY *psaStrings = SafeArrayCreateVector(VT_VARIANT, 0, 1);
+	if (psaStrings == NULL) {
+		pHtmlDoc->close();
+		return;
+	}
+	VARIANT *param;
+	hr = SafeArrayAccessData(psaStrings, (LPVOID*)&param);
+	param->vt = VT_BSTR;
+	param->bstrVal = bstr;
+	hr = SafeArrayUnaccessData(psaStrings);
+	hr = pHtmlDoc->write(psaStrings);
+	// SafeArrayDestroy calls SysFreeString for each BSTR
+	if (psaStrings != NULL) {
+		SafeArrayDestroy(psaStrings);
+		pHtmlDoc->close();
+	}
 }
 
 CComPtr<IHTMLTextContainer> getContainer(IDispatch* pDisp){
@@ -151,7 +144,7 @@ void setScrollTop(IDispatch* pDisp, float scrollPercent)
 		long top,height;
 		pTextContainer->get_scrollTop(&top);
 		pTextContainer->get_scrollHeight(&height);
-		pTextContainer->put_scrollTop(scrollPercent * height);
+		pTextContainer->put_scrollTop((long)(scrollPercent * height));
     } 
 }
 void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObject* /*pHint*/)
@@ -159,7 +152,10 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 	if(_bFirstNavigate){
 		_bFirstNavigate = false;
 		Navigate2(_T("about:blank"),NULL,NULL);
+		//return;
 	}
+	if(!(lParam & LPARAM_Update))
+		return;
 	float scrollTop = 0;
 	IDispatch* pDisp =GetHtmlDocument();
 	
@@ -169,7 +165,7 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 	const string& str = GetDocument()->getText();	
 
 	UpdateMd(str);
-	if(lParam == 1){
+	if(lParam & LPARAM_MoveEnd){
 		scrollTop = 1.0;
 	}
 	if(pSender != NULL){

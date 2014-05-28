@@ -152,7 +152,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 			pView->UpdateMd(STR_ABOUT);
 		else{
 			CLeftView* pLeft = dynamic_cast<CLeftView*>(m_wndSplitter.GetPane(0,0));
-			pView->GetDocument()->UpdateAllViews(pLeft);
+			pView->GetDocument()->UpdateAllViews(pLeft, LPARAM_Update);
 		}
 		s_bShowAbout = !s_bShowAbout;
 	}

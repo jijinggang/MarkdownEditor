@@ -45,7 +45,7 @@ BOOL CMarkdownEditorDoc::OnNewDocument()
 	if (!CDocument::OnNewDocument())
 		return FALSE;
 	resetData();
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(NULL, LPARAM_Update);
 	// TODO: 在此添加重新初始化代码
 	// (SDI 文档将重用该文档)
 	return TRUE;
@@ -66,11 +66,10 @@ void CMarkdownEditorDoc::Serialize(CArchive& ar)
 	else
 	{
 		
-		_strText = Util::ReadStringFile(*ar.GetFile());
-
+		_strText = Util::ReadStringFile(*ar.GetFile()).c_str();
 		Util::ReplaceAllStr(_strText,"\r\n", "\n");
 		Util::ReplaceAllStr(_strText,"\n", "\r\n");
-		this->UpdateAllViews(NULL);
+		this->UpdateAllViews(NULL,LPARAM_Update);
 		// TODO: 在此添加加载代码
 	}
 }
@@ -148,9 +147,9 @@ void CMarkdownEditorDoc::Dump(CDumpContext& dc) const
 //更新文本内容
 void CMarkdownEditorDoc::UpdateText(const string& text, CView* pSender, bool bMoveToEnd){
 	_strText = text;
-	LPARAM lParam = 0;
+	int lParam = LPARAM_Update;
 	if(bMoveToEnd)
-		lParam = 1;
+		lParam |= LPARAM_MoveEnd;
 	this->UpdateAllViews(pSender, lParam);
 	this->SetModifiedFlag();
 }
