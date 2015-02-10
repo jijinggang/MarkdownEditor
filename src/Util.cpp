@@ -14,6 +14,18 @@ Util::Util(void)
 Util::~Util(void)
 {
 }
+string Util::GetFilePath(const string& strPathFile, bool linuxPath){
+	size_t nFind = strPathFile.find_last_of('\\');
+	if (nFind < 0)
+	{
+		return strPathFile;
+	}
+	string strPath = strPathFile.substr(0, nFind + 1);
+	if (linuxPath){
+		strPath = Util::ReplaceAllStr(strPath, "\\", "/");
+	}
+	return strPath;
+}
 
 string Util::GetExePath(){
 	TCHAR szBuffer[MAX_PATH];

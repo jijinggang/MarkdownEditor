@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Util.h"
+#include <string>
 // SHARED_HANDLERS 可以在实现预览、缩略图和搜索筛选器句柄的
 // ATL 项目中进行定义，并允许与该项目共享文档代码。
 #ifndef SHARED_HANDLERS
@@ -86,6 +87,7 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 	HRESULT hr = pDoc ->QueryInterface(IID_IHTMLDocument2, (void**)&pHtmlDoc);
     if (FAILED(hr))
         return;
+
 	BSTR bstr = _com_util::ConvertStringToBSTR(strHtml.c_str());
 	// Creates a new one-dimensional array
 	SAFEARRAY *psaStrings = SafeArrayCreateVector(VT_VARIANT, 0, 1);
@@ -187,12 +189,31 @@ void CMarkdownEditorView::initCSS(){
 	}
 }
 
+string&  replaceImgSrc(string& str, string path)
+{
+	if (path.size() == 0)
+		return str;
+	string old_value = "<img src=\"";
+	string new_value = "<img src=\"" + path;
+	for (string::size_type pos(0); pos != string::npos; pos += old_value.length())   {
+		if ((pos = str.find(old_value, pos)) != string::npos){
+			const char* start = str.c_str() + pos + old_value.length();
+			if (strnicmp(start, "http://", 7) != 0 && strnicmp(start, "https://", 8) != 0)
+				str.replace(pos, old_value.length(), new_value);
+		}
+		else   
+			break;
+	}
+	return   str;
+}
 const string HTML_TMPL = "<html><head><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
 
 string CMarkdownEditorView::GetMdHtml(const string& str){
 	string strHtml = HTML_TMPL;
 	Util::ReplaceAllStr(strHtml,"{{0}}", _strCSS);
-	Util::ReplaceAllStr(strHtml, "{{1}}", Util::Text2Md(str));
+	string md = Util::Text2Md(str);
+	md = replaceImgSrc(md, GetDocument()->getFilePath());
+	Util::ReplaceAllStr(strHtml, "{{1}}", md);
 	return strHtml;
 }
 

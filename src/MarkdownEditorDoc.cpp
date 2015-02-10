@@ -58,6 +58,9 @@ BOOL CMarkdownEditorDoc::OnNewDocument()
 
 void CMarkdownEditorDoc::Serialize(CArchive& ar)
 {
+	string strFile = ar.GetFile()->GetFilePath();
+	_strPath = Util::GetFilePath(strFile,true);
+
 	if (ar.IsStoring())
 	{
 		ar.WriteString(Util::ANSIToUTF8(_strText.c_str()).c_str());
@@ -157,4 +160,5 @@ void CMarkdownEditorDoc::UpdateText(const string& text, CView* pSender, bool bMo
 void CMarkdownEditorDoc::resetData(void)
 {
 	_strText = "";
+	_strPath = "";
 }

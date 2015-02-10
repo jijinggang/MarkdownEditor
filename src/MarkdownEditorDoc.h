@@ -14,10 +14,11 @@ enum {
 class CMarkdownEditorDoc : public CDocument
 {
 private:
-	string _strText;
+	string _strText, _strPath;
 public:
 	void UpdateText(const string& text,  CView* pSender = NULL, bool bMoveToEnd = false);
 	const string& getText(){return _strText;} 
+	const string& getFilePath(){ return _strPath; }
 
 protected: // 仅从序列化创建
 	CMarkdownEditorDoc();
