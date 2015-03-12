@@ -53,9 +53,28 @@ CMarkdownEditorApp theApp;
 
 // CMarkdownEditorApp 初始化
 
+bool IsOSVerWindowsVista()
+{
+	OSVERSIONINFOEX osver;
+	ZeroMemory(&osver, sizeof(osver));
+	osver.dwOSVersionInfoSize = sizeof(osver);
+
+	if (!GetVersionEx((OSVERSIONINFO *)&osver))
+		return false;
+	if (osver.dwMajorVersion >= 6)
+		return true;
+	return false;
+}
+
 BOOL CMarkdownEditorApp::InitInstance()
 {
-	//string str = Util::Text2Md("- aaaa中国\r\n - bbbbb");
+	if (GetThreadLocale() != 0x804)
+	{
+		if (IsOSVerWindowsVista())
+			SetThreadUILanguage(0x409);
+		else
+			SetThreadLocale(0x409);
+	}
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControlsEx()。否则，将无法创建窗口。

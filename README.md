@@ -3,6 +3,7 @@ MarkdownEditor
 
 Lightweight markdown editor/viewer written by c++ , for windows user. It's a green software, only one exe file, and need not any other modules.
 
+![ScreenSnap](ScreenSnap.jpg)
 
 Download
 --------
