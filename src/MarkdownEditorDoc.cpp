@@ -144,8 +144,18 @@ void CMarkdownEditorDoc::Dump(CDumpContext& dc) const
 	CDocument::Dump(dc);
 }
 #endif //_DEBUG
-
-
+const CString PREFIX_MODIFIED = "* ";
+void setModified(CMarkdownEditorDoc*pDoc, bool modified) {
+	pDoc->SetModifiedFlag(modified);
+	//string path = pDoc->GetTitle();
+	CString title = pDoc->GetTitle();
+	if (modified) {
+		if (title.Find(PREFIX_MODIFIED) != 0) {
+			title = PREFIX_MODIFIED + title;
+		}
+	}
+	pDoc->SetTitle(title);
+}
 // CMarkdownEditorDoc 命令
 //更新文本内容
 void CMarkdownEditorDoc::UpdateText(const string& text, CView* pSender, bool bMoveToEnd){
@@ -154,7 +164,8 @@ void CMarkdownEditorDoc::UpdateText(const string& text, CView* pSender, bool bMo
 	if(bMoveToEnd)
 		lParam |= LPARAM_MoveEnd;
 	this->UpdateAllViews(pSender, lParam);
-	this->SetModifiedFlag();
+	setModified(this, true);
+	//this->SetModifiedFlag();
 }
 
 void CMarkdownEditorDoc::resetData(void)
