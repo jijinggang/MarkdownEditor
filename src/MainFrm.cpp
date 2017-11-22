@@ -14,6 +14,17 @@
 #define new DEBUG_NEW
 #endif
 
+#define IS_VIEWER_KEY  "isViewer"
+void saveViewer(bool enable) //把是否为阅读器模式保存到注册表,方便下次打开程序时自动使用之前的状态
+{
+	int value = enable ? 1 : 0;
+	AfxGetApp()->WriteProfileInt("", IS_VIEWER_KEY, value);
+}
+bool isViewer() //根据
+{
+	int value = AfxGetApp()->GetProfileInt("", IS_VIEWER_KEY, 0);
+	return value == 1;
+}
 // CMainFrame
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
@@ -38,7 +49,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 	CMainFrame::CMainFrame()
 	{
 		_bInited = false;
-		_bShowLeft = true;
+		_bShowLeft = !isViewer();
 		// TODO: 在此添加成员初始化代码
 	}
 
@@ -60,9 +71,6 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 			return -1;      // 未能创建
 		}
 		m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
-
-
-
 		return 0;
 	}
 
@@ -85,7 +93,6 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 		}
 
 		_bInited = true;
-
 		return TRUE;
 	}
 
@@ -130,13 +137,25 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 			return;
 		m_wndSplitter.SetColumnInfo(0,cx/2,10);
 		m_wndSplitter.RecalcLayout();
+
+		//打开时保留上次是否显示左侧编辑框的状态
+		static bool sFirst = true;
+		if (sFirst) {
+			sFirst = false;
+			bool show = isViewer();
+			if (show)
+				switchViewer(show);
+		}
 	}
 
 
 	void CMainFrame::OnSwitch(){
 		_bShowLeft = !_bShowLeft;
-		m_wndSplitter.ShowLeft(_bShowLeft);
-
+		switchViewer(!_bShowLeft);
+		saveViewer(!_bShowLeft);
+	}
+	void CMainFrame::switchViewer(bool viewer) {
+		m_wndSplitter.ShowLeft(!viewer);
 	}
 
 
