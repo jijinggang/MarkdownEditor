@@ -13,6 +13,7 @@
 
 #include "MarkdownEditorDoc.h"
 #include "MarkdownEditorView.h"
+#include "MyClickEvents.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -74,6 +75,16 @@ CMarkdownEditorDoc* CMarkdownEditorView::GetDocument() const // 非调试版本是内联
 }
 #endif //_DEBUG
 
+void setClickEvents(IHTMLDocument2* htmlDocument2, const char* dir) {
+
+	static CMyClickEvents clickEvents;
+	clickEvents.SetContext(htmlDocument2, dir);
+	_variant_t clickDispatch;
+	clickDispatch.vt = VT_DISPATCH;
+	clickDispatch.pdispVal = &clickEvents;
+
+	htmlDocument2->put_onclick(clickDispatch);
+}
 
 // CMarkdownEditorView 消息处理程序
 
@@ -101,6 +112,8 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 	param->bstrVal = bstr;
 	hr = SafeArrayUnaccessData(psaStrings);
 	hr = pHtmlDoc->write(psaStrings);
+
+	setClickEvents(pHtmlDoc, GetDocument()->getFilePath().c_str());
 	// SafeArrayDestroy calls SysFreeString for each BSTR
 	if (psaStrings != NULL) {
 		SafeArrayDestroy(psaStrings);

@@ -150,11 +150,11 @@ void setModified(CMarkdownEditorDoc*pDoc, bool modified) {
 	//string path = pDoc->GetTitle();
 	CString title = pDoc->GetTitle();
 	if (modified) {
-		if (title.Find(PREFIX_MODIFIED) != 0) {
-			title = PREFIX_MODIFIED + title;
-		}
+		CString strTitle;
+		AfxGetMainWnd()->GetWindowText(strTitle);
+		if (modified && strTitle.Find(PREFIX_MODIFIED) !=0)
+			AfxGetMainWnd()->SetWindowText("* " + strTitle);
 	}
-	pDoc->SetTitle(title);
 }
 // CMarkdownEditorDoc 命令
 //更新文本内容

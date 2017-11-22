@@ -62,6 +62,9 @@
     <ClInclude Include="MySplitterWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MyClickEvents.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MarkdownEditor.cpp">
@@ -110,6 +113,9 @@
       <Filter>sundown</Filter>
     </ClCompile>
     <ClCompile Include="MySplitterWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyClickEvents.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

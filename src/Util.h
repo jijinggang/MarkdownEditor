@@ -8,7 +8,9 @@ public:
 	Util(void);
 	~Util(void);
 	static string Text2Md(const string& str);
+	static string GetFileExt(const string& strPathFile);
 	static string GetFilePath(const string& strPathFile, bool linuxPath = false);
+	static string GetFileName(const string& strPathFile);
 	static string GetExePath();
 	static string ReadStringFile(LPCTSTR strFileName);
 	static string ReadStringFile(CFile& file);

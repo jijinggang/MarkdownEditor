@@ -4,6 +4,8 @@
 #include "sundown/html.h"
 #include <sstream>
 #include <string>
+#include <cctype>  
+#include <algorithm>  
 
 using namespace std;
 Util::Util(void)
@@ -13,6 +15,17 @@ Util::Util(void)
 
 Util::~Util(void)
 {
+}
+
+string Util::GetFileExt(const string& strPathFile) {
+	size_t nFind = strPathFile.find_last_of('.');
+	if (nFind < 0)
+	{
+		return "";
+	}
+	string s = strPathFile.substr(nFind + 1);
+	std::transform(s.begin(), s.end(), s.begin(), (int(*)(int))tolower);
+	return s;
 }
 string Util::GetFilePath(const string& strPathFile, bool linuxPath){
 	size_t nFind = strPathFile.find_last_of('\\');
@@ -26,7 +39,15 @@ string Util::GetFilePath(const string& strPathFile, bool linuxPath){
 	}
 	return strPath;
 }
-
+string Util::GetFileName(const string& strPathFile) {
+	size_t nFind = strPathFile.find_last_of('\\');
+	if (nFind < 0)
+	{
+		return strPathFile;
+	}
+	string strPath = strPathFile.substr(nFind + 1);
+	return strPath;
+}
 string Util::GetExePath(){
 	TCHAR szBuffer[MAX_PATH];
 	::GetModuleFileName(NULL, szBuffer, sizeof(szBuffer) / sizeof(TCHAR));

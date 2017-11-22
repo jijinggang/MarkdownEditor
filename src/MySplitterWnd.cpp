@@ -3,6 +3,8 @@
 
 CMySplitterWnd::CMySplitterWnd(void)
 {
+	_leftPercent = 0;
+	_cx = _cy = 0;
 }
 
 
@@ -15,7 +17,7 @@ void CMySplitterWnd::ShowSplitter(bool bShow)
 {
 	if(!bShow){
 		_cx = m_cxSplitterGap;//savepreviouscx
-		_cy = m_cxSplitterGap;//saveprevious cy
+		_cy = m_cySplitterGap;//saveprevious cy
 		m_cxSplitterGap=1;
 		m_cySplitterGap=1;
 	}else{

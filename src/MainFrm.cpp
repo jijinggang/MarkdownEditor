@@ -159,7 +159,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 	}
 
 
-	const string STR_ABOUT = "#MarkdownEditor 1.0\nProject: <https://github.com/jijinggang/MarkdownEditor>\n##Author\njijinggang@gmail.com\n##Copyright\nFree For All";
+	const string STR_ABOUT = "#MarkdownEditor 1.1\nProject: <https://github.com/jijinggang/MarkdownEditor>\n##Author\njijinggang@gmail.com\n##Copyright\nFree For All";
 	//注意，此相应函数必须放在MainFrame中，如果放在MarkdownEditorView中，如果MarkdownEditorView失去焦点，则菜单不能点
 	void CMainFrame::OnAbout()
 	{
