@@ -72,8 +72,8 @@ string Util::Text2Md(const string& str){
 	int ret;
 
 	ob = bufnew(OUTPUT_UNIT);
-	sdhtml_renderer(&callbacks, &options, 0);
-	markdown = sd_markdown_new(MKDEXT_NO_INTRA_EMPHASIS|MKDEXT_TABLES|MKDEXT_AUTOLINK|MKDEXT_FENCED_CODE|MKDEXT_STRIKETHROUGH|MKDEXT_SUPERSCRIPT, 16, &callbacks, &options);
+	sdhtml_renderer(&callbacks, &options, 0| HTML_TOC);
+	markdown = sd_markdown_new(MKDEXT_NO_INTRA_EMPHASIS|MKDEXT_TABLES|MKDEXT_AUTOLINK|MKDEXT_FENCED_CODE|MKDEXT_STRIKETHROUGH|MKDEXT_SUPERSCRIPT| MKDEXT_SPACE_HEADERS| MKDEXT_LAX_SPACING, 16, &callbacks, &options);
 
 	sd_markdown_render(ob, (const uint8_t*)(str.c_str()), str.size(), markdown);
 	//sd_markdown_render(ob, ib->data, ib->size, markdown);
