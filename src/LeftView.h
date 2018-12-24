@@ -7,7 +7,7 @@
 
 class CMarkdownEditorDoc;
 
-class CLeftView : public CEditView
+class CLeftView : public CRichEditView
 {
 private:
 	CFont _font;

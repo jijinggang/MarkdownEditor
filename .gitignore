@@ -20,3 +20,7 @@ ipch
 *.aps
 /download/MarkdownEditor.exe
 /download/MarkdownEditor.exe
+src/.vs/MarkdownEditor/v15/Browse.VC.db
+download/MarkdownEditor.iobj
+download/MarkdownEditor.ipdb
+src/.vs/MarkdownEditor/v15/Browse.VC.opendb
