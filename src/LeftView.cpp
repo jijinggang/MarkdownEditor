@@ -72,7 +72,7 @@ CMarkdownEditorDoc* CLeftView::GetDocument() // 非调试版本是内联的
 
 // CLeftView 消息处理程序
 
-
+bool g_isOpenFile = false;
 void CLeftView::OnEnChange()
 {
 	// TODO:  如果该控件是 RICHEDIT 控件，它将不
@@ -80,7 +80,11 @@ void CLeftView::OnEnChange()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。 
 
-	// TODO:  在此添加控件通知处理程序代码
+	if (g_isOpenFile) {
+		//打开新文件导致的文本变化不处理
+		g_isOpenFile = false;
+		return;
+	}
 	CString str;
 	this->GetWindowText(str);
 	string strText(str.GetBuffer());
@@ -93,7 +97,6 @@ void CLeftView::OnEnChange()
 	}
 	GetDocument()->UpdateText(strText, this, bMoveToEnd);
 	GetRichEditCtrl().SetFocus();
-
 }
 
 
@@ -102,7 +105,10 @@ void CLeftView::OnUpdate(CView* pSender, LPARAM lHint, CObject* /*pHint*/)
 	// TODO: 在此添加专用代码和/或调用基类
 	if(pSender == this || !(lHint & LPARAM_Update))
 		return;
-	GetRichEditCtrl().SetWindowText(GetDocument()->getText().c_str());
+	if (pSender == NULL) {
+		g_isOpenFile = true;
+		GetRichEditCtrl().SetWindowText(GetDocument()->getText().c_str());
+	}
 }
 
 int CLeftView::OnCreate(LPCREATESTRUCT lpCreateStruct)
