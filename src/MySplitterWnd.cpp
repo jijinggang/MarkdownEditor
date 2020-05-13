@@ -39,6 +39,7 @@ void CMySplitterWnd::ShowLeft(bool bShow){
 		this->SetColumnInfo(0,0,10);
 	}
 	ShowSplitter(bShow);
-	RecalcLayout();
 	pLeft->ShowWindow(bShow);
+	RecalcLayout();
+
 }
