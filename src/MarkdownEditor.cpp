@@ -130,9 +130,9 @@ BOOL CMarkdownEditorApp::InitInstance()
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
-	// 启用“DDE 执行”
-	EnableShellOpen();
-	RegisterShellFileTypes(TRUE);
+	// 注释掉把MarkdownEditor作为md文档的默认程序操作
+	//EnableShellOpen();
+	//RegisterShellFileTypes(TRUE);
 
 
 	// 调度在命令行中指定的命令。如果
