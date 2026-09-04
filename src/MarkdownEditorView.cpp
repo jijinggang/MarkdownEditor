@@ -152,14 +152,14 @@ CComPtr<IHTMLTextContainer> getContainer(IDispatch* pDisp){
 }
 float getScrollTop(IDispatch* pDisp)
 {
-    long scrollTop;
+    long scrollTop = 0;
 	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
-    if (pTextContainer &&  S_OK == pTextContainer->get_scrollTop(&scrollTop) ) 
+    if (pTextContainer &&  S_OK == pTextContainer->get_scrollTop(&scrollTop) )
     {
-		long height;
-		pTextContainer->get_scrollHeight(&height);
-		return ((float)scrollTop)/height ;
-    } 
+		long height = 0;
+		if (S_OK == pTextContainer->get_scrollHeight(&height) && height > 0)
+			return ((float)scrollTop)/height ;
+    }
 	return 0.0;
 }
 void setScrollTop(IDispatch* pDisp, float scrollPercent)
@@ -167,11 +167,17 @@ void setScrollTop(IDispatch* pDisp, float scrollPercent)
 	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
     if (pTextContainer)
     {
-		long top,height;
-		pTextContainer->get_scrollTop(&top);
+		long height = 0;
 		pTextContainer->get_scrollHeight(&height);
-		pTextContainer->put_scrollTop((long)(scrollPercent * height));
-    } 
+		if (height > 0) {
+			long pos = (long)(scrollPercent * height);
+			if (pos < 0)
+				pos = 0;
+			if (pos > height)
+				pos = height;
+			pTextContainer->put_scrollTop(pos);
+		}
+    }
 }
 void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObject* /*pHint*/)
 {

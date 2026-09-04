@@ -1,5 +1,5 @@
 
-// MainFrm.cpp : CMainFrame ÀàµÄÊµÏÖ
+// MainFrm.cpp : CMainFrame ï¿½ï¿½ï¿½Êµï¿½ï¿½
 //
 
 #include "stdafx.h"
@@ -15,12 +15,12 @@
 #endif
 
 #define IS_VIEWER_KEY  _T("isViewer")
-void saveViewer(bool enable) //°ÑÊÇ·ñÎªÔÄ¶ÁÆ÷Ä£Ê½±£´æµ½×¢²á±í,·½±ãÏÂ´Î´ò¿ª³ÌÐòÊ±×Ô¶¯Ê¹ÓÃÖ®Ç°µÄ×´Ì¬
+void saveViewer(bool enable) //ï¿½ï¿½ï¿½Ç·ï¿½Îªï¿½Ä¶ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½æµ½×¢ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Â´Î´ò¿ª³ï¿½ï¿½ï¿½Ê±ï¿½Ô¶ï¿½Ê¹ï¿½ï¿½Ö®Ç°ï¿½ï¿½×´Ì¬
 {
 	int value = enable ? 1 : 0;
 	AfxGetApp()->WriteProfileInt(_T(""), IS_VIEWER_KEY, value);
 }
-bool isViewer() //¸ù¾Ý
+bool isViewer() //ï¿½ï¿½ï¿½ï¿½
 {
 	int value = AfxGetApp()->GetProfileInt(_T(""), IS_VIEWER_KEY, 0);
 	return value == 1;
@@ -38,19 +38,19 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 	static UINT indicators[] =
 	{
-		ID_SEPARATOR,           // ×´Ì¬ÐÐÖ¸Ê¾Æ÷
+		ID_SEPARATOR,           // ×´Ì¬ï¿½ï¿½Ö¸Ê¾ï¿½ï¿½
 		ID_INDICATOR_CAPS,
 		ID_INDICATOR_NUM,
 		ID_INDICATOR_SCRL,
 	};
 
-	// CMainFrame ¹¹Ôì/Îö¹¹
+	// CMainFrame ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
 
 	CMainFrame::CMainFrame()
 	{
 		_bInited = false;
 		_bShowLeft = !isViewer();
-		// TODO: ÔÚ´ËÌí¼Ó³ÉÔ±³õÊ¼»¯´úÂë
+		// TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½Ó³ï¿½Ô±ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	}
 
 	CMainFrame::~CMainFrame()
@@ -67,8 +67,8 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 		if (!m_wndStatusBar.Create(this))
 		{
-			TRACE0("Î´ÄÜ´´½¨×´Ì¬À¸\n");
-			return -1;      // Î´ÄÜ´´½¨
+			TRACE0("Î´ï¿½Ü´ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½\n");
+			return -1;      // Î´ï¿½Ü´ï¿½ï¿½ï¿½
 		}
 		m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
 		return 0;
@@ -77,9 +77,10 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 	BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/,
 		CCreateContext* pContext)
 	{
-		// ´´½¨²ð·Ö´°¿Ú
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½
 		if (!m_wndSplitter.CreateStatic(this, 1, 2))
 			return FALSE;
+		m_wndSplitter.SetLeftPercent(0.5);
 
 		CRect rect;
 		this->GetWindowRect(&rect);
@@ -100,13 +101,13 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 	{
 		if( !CFrameWnd::PreCreateWindow(cs) )
 			return FALSE;
-		// TODO: ÔÚ´Ë´¦Í¨¹ýÐÞ¸Ä
-		//  CREATESTRUCT cs À´ÐÞ¸Ä´°¿ÚÀà»òÑùÊ½
+		// TODO: ï¿½Ú´Ë´ï¿½Í¨ï¿½ï¿½ï¿½Þ¸ï¿½
+		//  CREATESTRUCT cs ï¿½ï¿½ï¿½Þ¸Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½
 
 		return TRUE;
 	}
 
-	// CMainFrame Õï¶Ï
+	// CMainFrame ï¿½ï¿½ï¿½
 
 #ifdef _DEBUG
 	void CMainFrame::AssertValid() const
@@ -121,7 +122,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 #endif //_DEBUG
 
 
-	// CMainFrame ÏûÏ¢´¦Àí³ÌÐò
+	// CMainFrame ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 	void CMainFrame::OnSize(UINT nType, int cx, int cy)
@@ -131,14 +132,15 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 			return;
 		if(cx == 0 || cy == 0)
 			return;
-		int cxCur, cxMin;
-		m_wndSplitter.GetColumnInfo(0, cxCur, cxMin); 
-		if(cxCur <= 0)
+		if(!m_wndSplitter.IsLeftVisible())
 			return;
-		m_wndSplitter.SetColumnInfo(0,cx/2,10);
+		// keep the user's split proportion when the window is resized
+		// (this used to force a 50/50 split on every WM_SIZE)
+		m_wndSplitter.SaveLeftRatio();
+		m_wndSplitter.ApplyLeftRatio();
 		m_wndSplitter.RecalcLayout();
 
-		//´ò¿ªÊ±±£ÁôÉÏ´ÎÊÇ·ñÏÔÊ¾×ó²à±à¼­¿òµÄ×´Ì¬
+		//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½à¼­ï¿½ï¿½ï¿½×´Ì¬
 		static bool sFirst = true;
 		if (sFirst) {
 			sFirst = false;
@@ -160,7 +162,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 
 	const string STR_ABOUT = "# MarkdownEditor 1.2\nProject: <https://github.com/jijinggang/MarkdownEditor>\n## Author\njijinggang@gmail.com\n## Copyright\nFree For All";
-	//×¢Òâ£¬´ËÏàÓ¦º¯Êý±ØÐë·ÅÔÚMainFrameÖÐ£¬Èç¹û·ÅÔÚMarkdownEditorViewÖÐ£¬Èç¹ûMarkdownEditorViewÊ§È¥½¹µã£¬Ôò²Ëµ¥²»ÄÜµã
+	//×¢ï¿½â£¬ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½MainFrameï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½MarkdownEditorViewï¿½Ð£ï¿½ï¿½ï¿½ï¿½MarkdownEditorViewÊ§È¥ï¿½ï¿½ï¿½ã£¬ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Üµï¿½
 	void CMainFrame::OnAbout()
 	{
 		static bool s_bShowAbout = false;
