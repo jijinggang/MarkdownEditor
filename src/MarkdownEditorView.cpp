@@ -81,9 +81,12 @@ CMarkdownEditorDoc* CMarkdownEditorView::GetDocument() const // �ǵ��԰汾
 void CMarkdownEditorView::setClickEvents(IHTMLDocument2* htmlDocument2)
 {
 	if (!_spClickEvents) {
-		CComPtr<IDispatch> pSink;
-		pSink.Attach(new CMyClickEvents()); // refcount 0 -> CComPtr owns the first ref
-		_spClickEvents = pSink;
+		// CComPtr::operator=(T*) takes ownership (no extra AddRef): exactly
+		// one reference for the view. Do NOT route it through a temporary
+		// CComPtr - the temporary's destructor would release the same
+		// reference and destroy the sink while _spClickEvents still points
+		// at it.
+		_spClickEvents = new CMyClickEvents();
 	}
 	static_cast<CMyClickEvents*>((IDispatch*)_spClickEvents)
 		->SetContext(htmlDocument2, GetDocument()->getFilePath().c_str());

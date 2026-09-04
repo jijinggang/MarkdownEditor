@@ -4,7 +4,6 @@
 #include <algorithm>
 #include "./Util.h"
 
-
 //{{{url_encode
 static unsigned char hexchars[] = "0123456789ABCDEF";
 
@@ -122,7 +121,6 @@ void url_decode(std::string &str)
 CMyClickEvents::CMyClickEvents()
 	: _refCount(0)
 {
-
 }
 
 
