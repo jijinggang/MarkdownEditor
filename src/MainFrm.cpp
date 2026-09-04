@@ -134,10 +134,8 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 			return;
 		if(!m_wndSplitter.IsLeftVisible())
 			return;
-		// keep the user's split proportion when the window is resized
-		// (this used to force a 50/50 split on every WM_SIZE)
-		m_wndSplitter.SaveLeftRatio();
-		m_wndSplitter.ApplyLeftRatio();
+		// keep the original behavior: the split stays 50/50 when resizing
+		m_wndSplitter.SetColumnInfo(0,cx/2,10);
 		m_wndSplitter.RecalcLayout();
 
 		//��ʱ�����ϴ��Ƿ���ʾ���༭���״̬
