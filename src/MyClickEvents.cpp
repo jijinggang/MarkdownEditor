@@ -182,8 +182,8 @@ void openUrl(char* href, const char* dir) {
 		url = dir  + url;
 	}
 	//url = "C:/Users/Ourpalm/Desktop/1.md";
-	ShellExecute(0, _T("open"), url.c_str(), 0,  dir , SW_SHOWNORMAL);
-	int err = GetLastError();
+	// internal strings are UTF-8; widen only at the OS boundary
+	ShellExecuteW(0, L"open", CA2W(url.c_str(), CP_UTF8), 0, CA2W(dir, CP_UTF8), SW_SHOWNORMAL);
 	//}
 }
 HRESULT STDMETHODCALLTYPE CMyClickEvents::Invoke(

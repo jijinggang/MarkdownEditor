@@ -99,7 +99,8 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
     if (FAILED(hr))
         return;
 
-	BSTR bstr = _com_util::ConvertStringToBSTR(strHtml.c_str());
+	const wstring wstrHtml = Util::Utf8ToUtf16(strHtml.c_str(), (int)strHtml.size());
+	CComBSTR bstr((int)wstrHtml.size(), wstrHtml.c_str());
 	// Creates a new one-dimensional array
 	SAFEARRAY *psaStrings = SafeArrayCreateVector(VT_VARIANT, 0, 1);
 	if (psaStrings == NULL) {
@@ -194,11 +195,11 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 
 
 void CMarkdownEditorView::initCSS(){
-	string strUserCss = Util::GetExePath() + "user.css";
-	if(PathFileExists(strUserCss.c_str())){
-		_strCSS = Util::ReadStringFile(strUserCss.c_str());
+	const CStringW strUserCss = Util::Utf8ToUtf16((Util::GetExePath() + "user.css").c_str()).c_str();
+	if(PathFileExists(strUserCss)){
+		_strCSS = Util::ReadStringFile(strUserCss);
 	}else{
-		Util::LoadStringRes(IDR_CSS,"CSS",_strCSS); 
+		Util::LoadStringRes(IDR_CSS,_T("CSS"),_strCSS); 
 	}
 }
 
@@ -219,7 +220,7 @@ string&  replaceImgSrc(string& str, string path)
 	}
 	return   str;
 }
-const string HTML_TMPL = "<html><head><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
+const string HTML_TMPL = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
 
 string CMarkdownEditorView::GetMdHtml(const string& str){
 	string strHtml = HTML_TMPL;

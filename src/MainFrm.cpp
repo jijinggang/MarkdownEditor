@@ -14,15 +14,15 @@
 #define new DEBUG_NEW
 #endif
 
-#define IS_VIEWER_KEY  "isViewer"
+#define IS_VIEWER_KEY  _T("isViewer")
 void saveViewer(bool enable) //把是否为阅读器模式保存到注册表,方便下次打开程序时自动使用之前的状态
 {
 	int value = enable ? 1 : 0;
-	AfxGetApp()->WriteProfileInt("", IS_VIEWER_KEY, value);
+	AfxGetApp()->WriteProfileInt(_T(""), IS_VIEWER_KEY, value);
 }
 bool isViewer() //根据
 {
-	int value = AfxGetApp()->GetProfileInt("", IS_VIEWER_KEY, 0);
+	int value = AfxGetApp()->GetProfileInt(_T(""), IS_VIEWER_KEY, 0);
 	return value == 1;
 }
 // CMainFrame

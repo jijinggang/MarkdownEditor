@@ -58,18 +58,19 @@ BOOL CMarkdownEditorDoc::OnNewDocument()
 
 void CMarkdownEditorDoc::Serialize(CArchive& ar)
 {
-	string strFile = ar.GetFile()->GetFilePath();
+	string strFile = Util::Utf16ToUtf8(ar.GetFile()->GetFilePath().GetString());
 	_strPath = Util::GetFilePath(strFile,true);
 
 	if (ar.IsStoring())
 	{
-		ar.WriteString(Util::ANSIToUTF8(_strText.c_str()).c_str());
+		// _strText is UTF-8; write raw bytes (CArchive::WriteString would emit UTF-16)
+		ar.GetFile()->Write(_strText.data(), (UINT)_strText.size());
 		// TODO: 在此添加存储代码
 	}
 	else
 	{
 		
-		_strText = Util::ReadStringFile(*ar.GetFile()).c_str();
+		_strText = Util::ReadStringFile(*ar.GetFile());
 		Util::ReplaceAllStr(_strText,"\r\n", "\n");
 		Util::ReplaceAllStr(_strText,"\n", "\r\n");
 		this->UpdateAllViews(NULL,LPARAM_Update);
@@ -144,7 +145,7 @@ void CMarkdownEditorDoc::Dump(CDumpContext& dc) const
 	CDocument::Dump(dc);
 }
 #endif //_DEBUG
-const CString PREFIX_MODIFIED = "* ";
+const CString PREFIX_MODIFIED = _T("* ");
 void setModified(CMarkdownEditorDoc*pDoc, bool modified) {
 	pDoc->SetModifiedFlag(modified);
 	//string path = pDoc->GetTitle();
@@ -153,7 +154,7 @@ void setModified(CMarkdownEditorDoc*pDoc, bool modified) {
 		CString strTitle;
 		AfxGetMainWnd()->GetWindowText(strTitle);
 		if (modified && strTitle.Find(PREFIX_MODIFIED) !=0)
-			AfxGetMainWnd()->SetWindowText("* " + strTitle);
+			AfxGetMainWnd()->SetWindowText(CString("* ") + strTitle);
 	}
 }
 // CMarkdownEditorDoc 命令
