@@ -134,10 +134,8 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 			return;
 		if(!m_wndSplitter.IsLeftVisible())
 			return;
-		// default is 50/50, but once the user has dragged the splitter,
-		// resizing keeps their proportion
-		m_wndSplitter.SaveLeftRatio();
-		m_wndSplitter.ApplyLeftRatio();
+		// always keep the split 50/50 when resizing
+		m_wndSplitter.SetColumnInfo(0,cx/2,10);
 		m_wndSplitter.RecalcLayout();
 
 		//��ʱ�����ϴ��Ƿ���ʾ���༭���״̬
