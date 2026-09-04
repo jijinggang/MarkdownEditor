@@ -241,11 +241,53 @@ string&  replaceImgSrc(string& str, string path)
 }
 const string HTML_TMPL = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
 
+// Raw HTML blocks pass through sundown, so a malicious file could carry a
+// <script> element and MSHTML would execute it inside the preview. Strip
+// script elements before handing the HTML to the browser control. (Links are
+// separately gated by the scheme allowlist in CMyClickEvents::openUrl.)
+static void StripScriptTags(string& html)
+{
+	string::size_type pos = 0;
+	for (;;)
+	{
+		const string::size_type n = html.size();
+		// find the next "<script" (case-insensitive, not a prefix like "<scriptx")
+		string::size_type start = string::npos;
+		for (string::size_type i = html.find('<', pos); i != string::npos && i + 7 <= n;
+			i = html.find('<', i + 1))
+		{
+			if (strnicmp(html.c_str() + i, "<script", 7) == 0
+				&& (i + 7 == n || !isalnum((unsigned char)html[i + 7])))
+			{
+				start = i;
+				break;
+			}
+		}
+		if (start == string::npos)
+			return;
+		// find the closing "</script" and its '>'; strip to the end if absent
+		string::size_type end = n;
+		for (string::size_type i = html.find('<', start + 7); i != string::npos && i + 8 <= n;
+			i = html.find('<', i + 1))
+		{
+			if (strnicmp(html.c_str() + i, "</script", 8) == 0)
+			{
+				string::size_type gt = html.find('>', i + 8);
+				end = (gt == string::npos) ? n : gt + 1;
+				break;
+			}
+		}
+		html.erase(start, end - start);
+		pos = start;
+	}
+}
+
 string CMarkdownEditorView::GetMdHtml(const string& str){
 	string strHtml = HTML_TMPL;
 	Util::ReplaceAllStr(strHtml,"{{0}}", _strCSS);
 	string md = Util::Text2Md(str);
 	md = replaceImgSrc(md, GetDocument()->getFilePath());
+	StripScriptTags(md);
 	Util::ReplaceAllStr(strHtml, "{{1}}", md);
 	return strHtml;
 }
