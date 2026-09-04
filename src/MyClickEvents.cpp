@@ -119,8 +119,9 @@ void url_decode(std::string &str)
 
 
 CMyClickEvents::CMyClickEvents()
+	: _refCount(0)
 {
-	
+
 }
 
 
@@ -129,8 +130,31 @@ CMyClickEvents::~CMyClickEvents()
 {
 }
 
+// IUnknown
+HRESULT STDMETHODCALLTYPE CMyClickEvents::QueryInterface(
+	REFIID riid, void** ppvObject) {
+	if (ppvObject == NULL)
+		return E_POINTER;
+	*ppvObject = NULL;
+	if (riid == IID_IUnknown || riid == IID_IDispatch) {
+		*ppvObject = static_cast<IDispatch*>(this);
+		AddRef();
+		return S_OK;
+	}
+	return E_NOINTERFACE;
+}
+ULONG STDMETHODCALLTYPE CMyClickEvents::AddRef(void) {
+	return ++_refCount;
+}
+ULONG STDMETHODCALLTYPE CMyClickEvents::Release(void) {
+	const ULONG r = --_refCount;
+	if (r == 0)
+		delete this;
+	return r;
+}
+
 void CMyClickEvents::SetContext(IHTMLDocument2* doc, const char*dir) {
-	_pHtmlDoc2 = doc;
+	_pHtmlDoc2 = doc; // CComPtr releases the previous document
 	_currentDirectory = dir;
 }
 
@@ -203,6 +227,8 @@ HRESULT STDMETHODCALLTYPE CMyClickEvents::Invoke(
 	pExcepInfo = 0;
 	puArgErr = 0;
 	HRESULT hr;
+	if (!_pHtmlDoc2)
+		return S_OK;
 
 	CComPtr<IHTMLWindow2> htmlWindow2 = NULL;
 	hr = _pHtmlDoc2->get_parentWindow(

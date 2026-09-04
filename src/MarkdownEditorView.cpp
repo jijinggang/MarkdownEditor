@@ -1,12 +1,12 @@
 
-// MarkdownEditorView.cpp : CMarkdownEditorView ÀàµÄÊµÏÖ
+// MarkdownEditorView.cpp : CMarkdownEditorView ï¿½ï¿½ï¿½Êµï¿½ï¿½
 //
 
 #include "stdafx.h"
 #include "Util.h"
 #include <string>
-// SHARED_HANDLERS ¿ÉÒÔÔÚÊµÏÖÔ¤ÀÀ¡¢ËõÂÔÍ¼ºÍËÑË÷É¸Ñ¡Æ÷¾ä±úµÄ
-// ATL ÏîÄ¿ÖÐ½øÐÐ¶¨Òå£¬²¢ÔÊÐíÓë¸ÃÏîÄ¿¹²ÏíÎÄµµ´úÂë¡£
+// SHARED_HANDLERS ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¸Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ATL ï¿½ï¿½Ä¿ï¿½Ð½ï¿½ï¿½Ð¶ï¿½ï¿½å£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ë¡£
 #ifndef SHARED_HANDLERS
 #include "MarkdownEditor.h"
 #endif
@@ -27,11 +27,11 @@ IMPLEMENT_DYNCREATE(CMarkdownEditorView, CHtmlView)
 BEGIN_MESSAGE_MAP(CMarkdownEditorView, CHtmlView)
 END_MESSAGE_MAP()
 
-// CMarkdownEditorView ¹¹Ôì/Îö¹¹
+// CMarkdownEditorView ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
 
 CMarkdownEditorView::CMarkdownEditorView()
 {
-	// TODO: ÔÚ´Ë´¦Ìí¼Ó¹¹Ôì´úÂë
+	// TODO: ï¿½Ú´Ë´ï¿½ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	_bFirstNavigate = true;
 	initCSS();
 }
@@ -42,8 +42,8 @@ CMarkdownEditorView::~CMarkdownEditorView()
 
 BOOL CMarkdownEditorView::PreCreateWindow(CREATESTRUCT& cs)
 {
-	// TODO: ÔÚ´Ë´¦Í¨¹ýÐÞ¸Ä
-	//  CREATESTRUCT cs À´ÐÞ¸Ä´°¿ÚÀà»òÑùÊ½
+	// TODO: ï¿½Ú´Ë´ï¿½Í¨ï¿½ï¿½ï¿½Þ¸ï¿½
+	//  CREATESTRUCT cs ï¿½ï¿½ï¿½Þ¸Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½
 
 	return CHtmlView::PreCreateWindow(cs);
 }
@@ -55,7 +55,7 @@ void CMarkdownEditorView::OnInitialUpdate()
 }
 
 
-// CMarkdownEditorView Õï¶Ï
+// CMarkdownEditorView ï¿½ï¿½ï¿½
 
 #ifdef _DEBUG
 void CMarkdownEditorView::AssertValid() const
@@ -68,35 +68,40 @@ void CMarkdownEditorView::Dump(CDumpContext& dc) const
 	CHtmlView::Dump(dc);
 }
 
-CMarkdownEditorDoc* CMarkdownEditorView::GetDocument() const // ·Çµ÷ÊÔ°æ±¾ÊÇÄÚÁªµÄ
+CMarkdownEditorDoc* CMarkdownEditorView::GetDocument() const // ï¿½Çµï¿½ï¿½Ô°æ±¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CMarkdownEditorDoc)));
 	return (CMarkdownEditorDoc*)m_pDocument;
 }
 #endif //_DEBUG
 
-void setClickEvents(IHTMLDocument2* htmlDocument2, const char* dir) {
-
-	static CMyClickEvents clickEvents;
-	clickEvents.SetContext(htmlDocument2, dir);
-	_variant_t clickDispatch;
-	clickDispatch.vt = VT_DISPATCH;
-	clickDispatch.pdispVal = &clickEvents;
-
-	htmlDocument2->put_onclick(clickDispatch);
+// The sink is heap-allocated once, cached for the view lifetime and
+// ref-counted: put_onclick AddRefs its own copy, and SetContext swaps the
+// (AddRef'd) document each time document.write creates a new one.
+void CMarkdownEditorView::setClickEvents(IHTMLDocument2* htmlDocument2)
+{
+	if (!_spClickEvents) {
+		CComPtr<IDispatch> pSink;
+		pSink.Attach(new CMyClickEvents()); // refcount 0 -> CComPtr owns the first ref
+		_spClickEvents = pSink;
+	}
+	static_cast<CMyClickEvents*>((IDispatch*)_spClickEvents)
+		->SetContext(htmlDocument2, GetDocument()->getFilePath().c_str());
+	CComVariant var((IDispatch*)_spClickEvents);
+	htmlDocument2->put_onclick(var);
 }
 
-// CMarkdownEditorView ÏûÏ¢´¦Àí³ÌÐò
+// CMarkdownEditorView ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 {
-	IDispatch* pDoc = GetHtmlDocument();
+	CComPtr<IDispatch> pDoc = GetHtmlDocument(); // AddRef'd; must not leak
 	if(NULL == pDoc)
 		return;
-	// È¡µÃÎÄµµÖÐµÄIPersistStreamInit¶ÔÏó
+	// È¡ï¿½ï¿½ï¿½Äµï¿½ï¿½Ðµï¿½IPersistStreamInitï¿½ï¿½ï¿½ï¿½
     CComPtr<IHTMLDocument2> pHtmlDoc;
 	HRESULT hr = pDoc ->QueryInterface(IID_IHTMLDocument2, (void**)&pHtmlDoc);
-    if (FAILED(hr))
+    if (FAILED(hr) || !pHtmlDoc)
         return;
 
 	const wstring wstrHtml = Util::Utf8ToUtf16(strHtml.c_str(), (int)strHtml.size());
@@ -107,14 +112,19 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 		pHtmlDoc->close();
 		return;
 	}
-	VARIANT *param;
+	VARIANT *param = NULL;
 	hr = SafeArrayAccessData(psaStrings, (LPVOID*)&param);
-	param->vt = VT_BSTR;
-	param->bstrVal = bstr;
+	if (SUCCEEDED(hr) && param != NULL) {
+		param->vt = VT_BSTR;
+		param->bstrVal = bstr.Detach(); // SafeArrayDestroy frees it
+	}
 	hr = SafeArrayUnaccessData(psaStrings);
-	hr = pHtmlDoc->write(psaStrings);
+	if (SUCCEEDED(hr))
+		hr = pHtmlDoc->write(psaStrings);
+	if (FAILED(hr))
+		TRACE("CMarkdownEditorView::NavigateHTML: IHTMLDocument2::write failed\n");
 
-	setClickEvents(pHtmlDoc, GetDocument()->getFilePath().c_str());
+	setClickEvents(pHtmlDoc);
 	// SafeArrayDestroy calls SysFreeString for each BSTR
 	if (psaStrings != NULL) {
 		SafeArrayDestroy(psaStrings);
@@ -173,7 +183,7 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 	if(!(lParam & LPARAM_Update))
 		return;
 	float scrollTop = 0;
-	IDispatch* pDisp =GetHtmlDocument();
+	CComPtr<IDispatch> pDisp = GetHtmlDocument(); // AddRef'd; must not leak
 	
 	if(pSender != NULL){
 		scrollTop = getScrollTop(pDisp);
@@ -190,7 +200,7 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 
 
 
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½×¨ï¿½Ã´ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½
 }
 
 

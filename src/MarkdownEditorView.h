@@ -11,7 +11,9 @@ class CMarkdownEditorView : public CHtmlView
 private:
 	bool _bFirstNavigate;
 	string _strCSS;
+	CComPtr<IDispatch> _spClickEvents; // cached onclick sink (ref-counted)
 	void initCSS();
+	void setClickEvents(IHTMLDocument2* htmlDocument2);
 	string GetMdHtml(const string& str);
 public:
 	void UpdateMd(const string& strMd);

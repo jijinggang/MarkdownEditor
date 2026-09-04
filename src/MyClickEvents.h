@@ -5,8 +5,9 @@ class CMyClickEvents :
 	public IDispatch
 {
 private:
-	IHTMLDocument2* _pHtmlDoc2;
+	CComPtr<IHTMLDocument2> _pHtmlDoc2; // AddRef'd; swapped on document change
 	std::string     _currentDirectory;
+	long _refCount;
 public:
 	CMyClickEvents();
 	void SetContext(IHTMLDocument2* doc, const char*dir);
@@ -14,29 +15,22 @@ public:
 
 
 	// IUnknown
-	HRESULT STDMETHODCALLTYPE CMyClickEvents::QueryInterface(
-		REFIID riid, void** ppvObject) {
-		*ppvObject = 0;
-		return E_NOTIMPL;
-	}
-	ULONG STDMETHODCALLTYPE CMyClickEvents::AddRef(void) {
-		return 1;
-	}
-	ULONG STDMETHODCALLTYPE CMyClickEvents::Release(void) {
-		return 1;
-	}
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		REFIID riid, void** ppvObject);
+	ULONG STDMETHODCALLTYPE AddRef(void);
+	ULONG STDMETHODCALLTYPE Release(void);
 	// IDispatch
-	HRESULT STDMETHODCALLTYPE CMyClickEvents::GetTypeInfoCount(
+	HRESULT STDMETHODCALLTYPE GetTypeInfoCount(
 		/* [out] */ UINT *pctinfo) {
 		return E_NOTIMPL;
 	}
-	HRESULT STDMETHODCALLTYPE CMyClickEvents::GetTypeInfo(
+	HRESULT STDMETHODCALLTYPE GetTypeInfo(
 		/* [in] */ UINT iTInfo,
 		/* [in] */ LCID lcid,
 		/* [out] */ ITypeInfo **ppTInfo) {
 		return E_NOTIMPL;
 	}
-	HRESULT STDMETHODCALLTYPE CMyClickEvents::GetIDsOfNames(
+	HRESULT STDMETHODCALLTYPE GetIDsOfNames(
 		/* [in] */ REFIID riid,
 		/* [in] */ LPOLESTR *rgszNames,
 		/* [in] */ UINT cNames,
@@ -54,4 +48,3 @@ public:
 		/* [out] */ EXCEPINFO *pExcepInfo,
 		/* [out] */ UINT *puArgErr);
 };
-
