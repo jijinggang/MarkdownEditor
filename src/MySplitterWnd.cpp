@@ -53,6 +53,7 @@ void CMySplitterWnd::ShowLeft(bool bShow){
 	if (_bLeftVisible && !bShow) {
 		SaveLeftRatio();
 		ShowSplitter(false);
+		SetColumnInfo(0,0,10); // collapse the left pane; column 1 fills the width
 	} else if (!_bLeftVisible && bShow) {
 		ShowSplitter(true);
 		ApplyLeftRatio();
