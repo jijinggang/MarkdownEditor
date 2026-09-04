@@ -71,7 +71,10 @@ string Util::Text2Md(const string& str){
 	struct sd_markdown *markdown;
 
 	ob = bufnew(OUTPUT_UNIT);
-	sdhtml_renderer(&callbacks, &options, 0| HTML_TOC);
+	// HTML_SAFELINK drops markdown-generated links with non-standard schemes.
+	// Raw HTML blocks still pass through, so openUrl()'s scheme allowlist is
+	// the real security gate; this is defense in depth.
+	sdhtml_renderer(&callbacks, &options, HTML_TOC | HTML_SAFELINK);
 	markdown = sd_markdown_new(MKDEXT_NO_INTRA_EMPHASIS|MKDEXT_TABLES|MKDEXT_AUTOLINK|MKDEXT_FENCED_CODE|MKDEXT_STRIKETHROUGH| MKDEXT_SPACE_HEADERS| MKDEXT_LAX_SPACING, 16, &callbacks, &options);
 
 	sd_markdown_render(ob, (const uint8_t*)(str.c_str()), str.size(), markdown);
