@@ -3,8 +3,9 @@
 
 CMySplitterWnd::CMySplitterWnd(void)
 {
-	_leftPercent = 0;
+	_leftPercent = 0.5;
 	_cx = _cy = 0;
+	_bLeftVisible = true;
 }
 
 
@@ -26,20 +27,38 @@ void CMySplitterWnd::ShowSplitter(bool bShow)
 	}
 }
 
-void CMySplitterWnd::ShowLeft(bool bShow){
-	CWnd* pLeft = this->GetPane(0,0);
+void CMySplitterWnd::SaveLeftRatio()
+{
 	CRect rect;
-	GetWindowRect(&rect);
-	if(bShow){
-		this->SetColumnInfo(0,(int)(_leftPercent*rect.Width()),10);
-	}else{
-		int cxCur, cxMin;
-		this->GetColumnInfo(0, cxCur, cxMin); 
-		_leftPercent = 1.0* cxCur /rect.Width();
-		this->SetColumnInfo(0,0,10);
+	GetClientRect(&rect);
+	int cxCur, cxMin;
+	GetColumnInfo(0, cxCur, cxMin);
+	if (rect.Width() > 0 && cxCur > 0)
+		_leftPercent = 1.0 * cxCur / rect.Width();
+}
+
+void CMySplitterWnd::ApplyLeftRatio()
+{
+	CRect rect;
+	GetClientRect(&rect);
+	if (rect.Width() > 0)
+		SetColumnInfo(0, (int)(_leftPercent * rect.Width()), 10);
+}
+
+void CMySplitterWnd::ShowLeft(bool bShow){
+	CWnd* pLeft = GetPane(0,0);
+	if (pLeft == NULL)
+		return;
+	// save the gap only on the visible->hidden transition (never on the way back)
+	if (_bLeftVisible && !bShow) {
+		SaveLeftRatio();
+		ShowSplitter(false);
+		SetColumnInfo(0,0,10); // collapse the left pane; column 1 fills the width
+	} else if (!_bLeftVisible && bShow) {
+		ShowSplitter(true);
+		ApplyLeftRatio();
 	}
-	ShowSplitter(bShow);
+	_bLeftVisible = bShow;
 	pLeft->ShowWindow(bShow);
 	RecalcLayout();
-
 }

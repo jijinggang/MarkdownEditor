@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "MyClickEvents.h"
-#include<string>
-#include"./Util.h"
-
+#include <string>
+#include <algorithm>
+#include "./Util.h"
 
 //{{{url_encode
 static unsigned char hexchars[] = "0123456789ABCDEF";
 
 /**
-* \brief ¶ÔurlÌØÊâ×Ö·û½øÐÐ±àÂë
-* \param s ÊäÈë×Ö·û´®
-* \param len ÊäÈë×Ö·û´®³¤¶È
-* \param new_length Êä³ö×Ö·û´®³¤¶È
-* \return Êä³ö±àÂëºóµÄurl×Ö·û´®£¬Õâ¶ÎÄÚ´æÔÙÊ¹ÓÃÍê³ÉÒÔºóÐèÒªÊÍ·Å
+* \brief ï¿½ï¿½urlï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½
+* \param s ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
+* \param len ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* \param new_length ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* \return ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½urlï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½Òªï¿½Í·ï¿½
 */
 char *url_encode(const char *s, int len, int *new_length)
 {
@@ -53,7 +53,7 @@ void url_encode(std::string &s)
 		free(buf);
 	}
 }
-//×Ö·û´®×ª»»ÕûÊý  
+//ï¿½Ö·ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  
 static inline int htoi(char *s)
 {
 	int value;
@@ -73,10 +73,10 @@ static inline int htoi(char *s)
 }
 
 /**
-* \brief url×Ö·û´®½âÂë
-* \param str ´ý½âÂëµÄ×Ö·û´®£¬Í¬Ê±Ò²×÷ÎªÊä³ö
-* \param len ´ý½âÂë×Ö·û´®µÄ³¤¶È
-* \return ½âÂëÒÔºóµÄ×Ö·û´®³¤¶È
+* \brief urlï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* \param str ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Í¬Ê±Ò²ï¿½ï¿½Îªï¿½ï¿½ï¿½
+* \param len ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½
+* \return ï¿½ï¿½ï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 int url_decode(char *str, int len)
 {
@@ -101,8 +101,8 @@ int url_decode(char *str, int len)
 }
 
 /**
-* \brief url×Ö·û´®½âÂë
-* \param str ´ý½âÂëµÄ×Ö·û´®£¬Í¬Ê±Ò²×÷ÎªÊä³ö
+* \brief urlï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+* \param str ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Í¬Ê±Ò²ï¿½ï¿½Îªï¿½ï¿½ï¿½
 */
 void url_decode(std::string &str)
 {
@@ -119,8 +119,8 @@ void url_decode(std::string &str)
 
 
 CMyClickEvents::CMyClickEvents()
+	: _refCount(0)
 {
-	
 }
 
 
@@ -129,8 +129,31 @@ CMyClickEvents::~CMyClickEvents()
 {
 }
 
+// IUnknown
+HRESULT STDMETHODCALLTYPE CMyClickEvents::QueryInterface(
+	REFIID riid, void** ppvObject) {
+	if (ppvObject == NULL)
+		return E_POINTER;
+	*ppvObject = NULL;
+	if (riid == IID_IUnknown || riid == IID_IDispatch) {
+		*ppvObject = static_cast<IDispatch*>(this);
+		AddRef();
+		return S_OK;
+	}
+	return E_NOINTERFACE;
+}
+ULONG STDMETHODCALLTYPE CMyClickEvents::AddRef(void) {
+	return ++_refCount;
+}
+ULONG STDMETHODCALLTYPE CMyClickEvents::Release(void) {
+	const ULONG r = --_refCount;
+	if (r == 0)
+		delete this;
+	return r;
+}
+
 void CMyClickEvents::SetContext(IHTMLDocument2* doc, const char*dir) {
-	_pHtmlDoc2 = doc;
+	_pHtmlDoc2 = doc; // CComPtr releases the previous document
 	_currentDirectory = dir;
 }
 
@@ -169,22 +192,58 @@ bool isImageFile(const string& file) {
 	return false;
 }
 
-void openUrl(char* href, const char* dir) {
-	//if (!browserWindow_->IsUrlAllowed(href, _countof(href))) {
+// Only links with a safe scheme (or relative paths) may be opened.
+static bool IsSafeHref(const string& url)
+{
+	string lower = url;
+	std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+	// reject control characters anywhere in the URL
+	for (string::size_type i = 0; i < lower.size(); i++) {
+		if (lower[i] < 0x20)
+			return false;
+	}
+	// scheme = [a-z][a-z0-9+.-]*":" ; no colon means a relative path
+	const string::size_type colon = lower.find(':');
+	if (colon == string::npos)
+		return true;
+	if (colon == 0)
+		return false;
+	for (string::size_type i = 0; i < colon; i++) {
+		const char c = lower[i];
+		if (i == 0) {
+			if (!(c >= 'a' && c <= 'z'))
+				return false;
+		} else if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
+			|| c == '+' || c == '.' || c == '-')) {
+			return false;
+		}
+	}
+	static const char* allowed[] = { "http:", "https:", "file:", "mailto:" };
+	for (int i = 0; i < (int)(sizeof(allowed)/sizeof(allowed[0])); i++) {
+		if (lower.compare(0, colon + 1, allowed[i]) == 0)
+			return true;
+	}
+	return false;
+}
+
+void openUrl(const string& href, const char* dir) {
 	std::string url = href;
 	url_decode(url);
 	if (isImageFile(url))
 		return;
-	if (url.find_first_of("file:///") == 0) {
-		url = url.substr(sizeof("file:///") - 1);
-	}else if (url.find_first_of("about:") == 0) {
-		url = url.substr(sizeof("about:")-1);
-		url = dir  + url;
+	// prefix match (find_first_of was a character-set test, not a substring test)
+	if (url.compare(0, 8, "file:///") == 0) {
+		url = url.substr(8);
+	}else if (url.compare(0, 6, "about:") == 0) {
+		url = url.substr(6);
+		url = dir + url;
 	}
-	//url = "C:/Users/Ourpalm/Desktop/1.md";
-	ShellExecute(0, _T("open"), url.c_str(), 0,  dir , SW_SHOWNORMAL);
-	int err = GetLastError();
-	//}
+	if (!IsSafeHref(url))
+		return;
+	// internal strings are UTF-8; widen only at the OS boundary
+	const INT_PTR h = (INT_PTR)ShellExecuteW(0, L"open", CA2W(url.c_str(), CP_UTF8), 0, CA2W(dir, CP_UTF8), SW_SHOWNORMAL);
+	if (h <= 32)
+		TRACE("openUrl: ShellExecute failed (result=%d)\n", (int)h);
 }
 HRESULT STDMETHODCALLTYPE CMyClickEvents::Invoke(
 	/* [in] */ DISPID dispId,
@@ -203,6 +262,8 @@ HRESULT STDMETHODCALLTYPE CMyClickEvents::Invoke(
 	pExcepInfo = 0;
 	puArgErr = 0;
 	HRESULT hr;
+	if (!_pHtmlDoc2)
+		return S_OK;
 
 	CComPtr<IHTMLWindow2> htmlWindow2 = NULL;
 	hr = _pHtmlDoc2->get_parentWindow(
@@ -226,9 +287,8 @@ HRESULT STDMETHODCALLTYPE CMyClickEvents::Invoke(
 		//	"IHTMLEventObj->get_srcElement() failed";
 		return S_OK;
 	}
-	_bstr_t hrefAttr(L"href");
-	VARIANT attrValue;
-	VariantInit(&attrValue);
+	CComBSTR hrefAttr(L"href");
+	CComVariant attrValue; // frees the BSTR on destruction
 	hr = htmlElement->getAttribute(hrefAttr, 0, &attrValue);
 	if (FAILED(hr)) {
 		//LOG_WARNING << "CMyClickEvents::Invoke() failed: "
@@ -239,7 +299,7 @@ HRESULT STDMETHODCALLTYPE CMyClickEvents::Invoke(
 		// Href attribute found. When not found vt is VT_NULL.
 		// Maximum url length in IE is 2084, see:
 		// http://support.microsoft.com/kb/208427
-		char* href = _com_util::ConvertBSTRToString(attrValue.bstrVal);
+		const string href = Util::Utf16ToUtf8(attrValue.bstrVal, SysStringLen(attrValue.bstrVal));
 
 		//
 		VARIANT eventReturn;

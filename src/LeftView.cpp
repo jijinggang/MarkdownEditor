@@ -7,6 +7,7 @@
 
 #include "MarkdownEditorDoc.h"
 #include "LeftView.h"
+#include "./Util.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -72,7 +73,6 @@ CMarkdownEditorDoc* CLeftView::GetDocument() // 非调试版本是内联的
 
 // CLeftView 消息处理程序
 
-bool g_isOpenFile = false;
 void CLeftView::OnEnChange()
 {
 	// TODO:  如果该控件是 RICHEDIT 控件，它将不
@@ -80,15 +80,14 @@ void CLeftView::OnEnChange()
 	// 函数并调用 CRichEditCtrl().SetEventMask()，
 	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。 
 
-	if (g_isOpenFile) {
-		//打开新文件导致的文本变化不处理
-		g_isOpenFile = false;
-		return;
-	}
 	CString str;
 	this->GetWindowText(str);
-	string strText(str.GetBuffer());
-	
+	string strText = Util::Utf16ToUtf8(str.GetString(), str.GetLength());
+	// Ignore EN_CHANGE caused by programmatically setting the control text
+	// (document load / new document). A real user edit always differs
+	// from the document text, so it is never swallowed.
+	if (strText == GetDocument()->getText())
+		return;
 	bool bMoveToEnd = false;
 	long iStart, iEnd;
 	this->GetRichEditCtrl().GetSel(iStart, iEnd);
@@ -106,8 +105,8 @@ void CLeftView::OnUpdate(CView* pSender, LPARAM lHint, CObject* /*pHint*/)
 	if(pSender == this || !(lHint & LPARAM_Update))
 		return;
 	if (pSender == NULL) {
-		g_isOpenFile = true;
-		GetRichEditCtrl().SetWindowText(GetDocument()->getText().c_str());
+		CStringW strText = Util::Utf8ToUtf16(GetDocument()->getText().c_str()).c_str();
+		GetRichEditCtrl().SetWindowText(strText);
 	}
 }
 
@@ -117,7 +116,7 @@ int CLeftView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  在此添加您专用的创建代码
-	_font.CreatePointFont(110,(LPCTSTR)"Consolas"); 
+	_font.CreatePointFont(110,_T("Consolas")); 
 	SetFont(&_font); 
 	//this->SetTabStops(16);
 	//this->ShowScrollBar(SB_HORZ,FALSE);

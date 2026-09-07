@@ -1,12 +1,12 @@
 
-// MarkdownEditorView.cpp : CMarkdownEditorView ÀàµÄÊµÏÖ
+// MarkdownEditorView.cpp : CMarkdownEditorView ï¿½ï¿½ï¿½Êµï¿½ï¿½
 //
 
 #include "stdafx.h"
 #include "Util.h"
 #include <string>
-// SHARED_HANDLERS ¿ÉÒÔÔÚÊµÏÖÔ¤ÀÀ¡¢ËõÂÔÍ¼ºÍËÑË÷É¸Ñ¡Æ÷¾ä±úµÄ
-// ATL ÏîÄ¿ÖÐ½øÐÐ¶¨Òå£¬²¢ÔÊÐíÓë¸ÃÏîÄ¿¹²ÏíÎÄµµ´úÂë¡£
+// SHARED_HANDLERS ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¸Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ATL ï¿½ï¿½Ä¿ï¿½Ð½ï¿½ï¿½Ð¶ï¿½ï¿½å£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ë¡£
 #ifndef SHARED_HANDLERS
 #include "MarkdownEditor.h"
 #endif
@@ -27,11 +27,11 @@ IMPLEMENT_DYNCREATE(CMarkdownEditorView, CHtmlView)
 BEGIN_MESSAGE_MAP(CMarkdownEditorView, CHtmlView)
 END_MESSAGE_MAP()
 
-// CMarkdownEditorView ¹¹Ôì/Îö¹¹
+// CMarkdownEditorView ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½
 
 CMarkdownEditorView::CMarkdownEditorView()
 {
-	// TODO: ÔÚ´Ë´¦Ìí¼Ó¹¹Ôì´úÂë
+	// TODO: ï¿½Ú´Ë´ï¿½ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	_bFirstNavigate = true;
 	initCSS();
 }
@@ -42,8 +42,8 @@ CMarkdownEditorView::~CMarkdownEditorView()
 
 BOOL CMarkdownEditorView::PreCreateWindow(CREATESTRUCT& cs)
 {
-	// TODO: ÔÚ´Ë´¦Í¨¹ýÐÞ¸Ä
-	//  CREATESTRUCT cs À´ÐÞ¸Ä´°¿ÚÀà»òÑùÊ½
+	// TODO: ï¿½Ú´Ë´ï¿½Í¨ï¿½ï¿½ï¿½Þ¸ï¿½
+	//  CREATESTRUCT cs ï¿½ï¿½ï¿½Þ¸Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½
 
 	return CHtmlView::PreCreateWindow(cs);
 }
@@ -55,7 +55,7 @@ void CMarkdownEditorView::OnInitialUpdate()
 }
 
 
-// CMarkdownEditorView Õï¶Ï
+// CMarkdownEditorView ï¿½ï¿½ï¿½
 
 #ifdef _DEBUG
 void CMarkdownEditorView::AssertValid() const
@@ -68,52 +68,66 @@ void CMarkdownEditorView::Dump(CDumpContext& dc) const
 	CHtmlView::Dump(dc);
 }
 
-CMarkdownEditorDoc* CMarkdownEditorView::GetDocument() const // ·Çµ÷ÊÔ°æ±¾ÊÇÄÚÁªµÄ
+CMarkdownEditorDoc* CMarkdownEditorView::GetDocument() const // ï¿½Çµï¿½ï¿½Ô°æ±¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CMarkdownEditorDoc)));
 	return (CMarkdownEditorDoc*)m_pDocument;
 }
 #endif //_DEBUG
 
-void setClickEvents(IHTMLDocument2* htmlDocument2, const char* dir) {
-
-	static CMyClickEvents clickEvents;
-	clickEvents.SetContext(htmlDocument2, dir);
-	_variant_t clickDispatch;
-	clickDispatch.vt = VT_DISPATCH;
-	clickDispatch.pdispVal = &clickEvents;
-
-	htmlDocument2->put_onclick(clickDispatch);
+// The sink is heap-allocated once, cached for the view lifetime and
+// ref-counted: put_onclick AddRefs its own copy, and SetContext swaps the
+// (AddRef'd) document each time document.write creates a new one.
+void CMarkdownEditorView::setClickEvents(IHTMLDocument2* htmlDocument2)
+{
+	if (!_spClickEvents) {
+		// CComPtr::operator=(T*) takes ownership (no extra AddRef): exactly
+		// one reference for the view. Do NOT route it through a temporary
+		// CComPtr - the temporary's destructor would release the same
+		// reference and destroy the sink while _spClickEvents still points
+		// at it.
+		_spClickEvents = new CMyClickEvents();
+	}
+	static_cast<CMyClickEvents*>((IDispatch*)_spClickEvents)
+		->SetContext(htmlDocument2, GetDocument()->getFilePath().c_str());
+	CComVariant var((IDispatch*)_spClickEvents);
+	htmlDocument2->put_onclick(var);
 }
 
-// CMarkdownEditorView ÏûÏ¢´¦Àí³ÌÐò
+// CMarkdownEditorView ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 {
-	IDispatch* pDoc = GetHtmlDocument();
+	CComPtr<IDispatch> pDoc = GetHtmlDocument(); // AddRef'd; must not leak
 	if(NULL == pDoc)
 		return;
-	// È¡µÃÎÄµµÖÐµÄIPersistStreamInit¶ÔÏó
+	// È¡ï¿½ï¿½ï¿½Äµï¿½ï¿½Ðµï¿½IPersistStreamInitï¿½ï¿½ï¿½ï¿½
     CComPtr<IHTMLDocument2> pHtmlDoc;
 	HRESULT hr = pDoc ->QueryInterface(IID_IHTMLDocument2, (void**)&pHtmlDoc);
-    if (FAILED(hr))
+    if (FAILED(hr) || !pHtmlDoc)
         return;
 
-	BSTR bstr = _com_util::ConvertStringToBSTR(strHtml.c_str());
+	const wstring wstrHtml = Util::Utf8ToUtf16(strHtml.c_str(), (int)strHtml.size());
+	CComBSTR bstr((int)wstrHtml.size(), wstrHtml.c_str());
 	// Creates a new one-dimensional array
 	SAFEARRAY *psaStrings = SafeArrayCreateVector(VT_VARIANT, 0, 1);
 	if (psaStrings == NULL) {
 		pHtmlDoc->close();
 		return;
 	}
-	VARIANT *param;
+	VARIANT *param = NULL;
 	hr = SafeArrayAccessData(psaStrings, (LPVOID*)&param);
-	param->vt = VT_BSTR;
-	param->bstrVal = bstr;
+	if (SUCCEEDED(hr) && param != NULL) {
+		param->vt = VT_BSTR;
+		param->bstrVal = bstr.Detach(); // SafeArrayDestroy frees it
+	}
 	hr = SafeArrayUnaccessData(psaStrings);
-	hr = pHtmlDoc->write(psaStrings);
+	if (SUCCEEDED(hr))
+		hr = pHtmlDoc->write(psaStrings);
+	if (FAILED(hr))
+		TRACE("CMarkdownEditorView::NavigateHTML: IHTMLDocument2::write failed\n");
 
-	setClickEvents(pHtmlDoc, GetDocument()->getFilePath().c_str());
+	setClickEvents(pHtmlDoc);
 	// SafeArrayDestroy calls SysFreeString for each BSTR
 	if (psaStrings != NULL) {
 		SafeArrayDestroy(psaStrings);
@@ -141,14 +155,14 @@ CComPtr<IHTMLTextContainer> getContainer(IDispatch* pDisp){
 }
 float getScrollTop(IDispatch* pDisp)
 {
-    long scrollTop;
+    long scrollTop = 0;
 	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
-    if (pTextContainer &&  S_OK == pTextContainer->get_scrollTop(&scrollTop) ) 
+    if (pTextContainer &&  S_OK == pTextContainer->get_scrollTop(&scrollTop) )
     {
-		long height;
-		pTextContainer->get_scrollHeight(&height);
-		return ((float)scrollTop)/height ;
-    } 
+		long height = 0;
+		if (S_OK == pTextContainer->get_scrollHeight(&height) && height > 0)
+			return ((float)scrollTop)/height ;
+    }
 	return 0.0;
 }
 void setScrollTop(IDispatch* pDisp, float scrollPercent)
@@ -156,11 +170,17 @@ void setScrollTop(IDispatch* pDisp, float scrollPercent)
 	CComPtr<IHTMLTextContainer> pTextContainer = getContainer(pDisp);
     if (pTextContainer)
     {
-		long top,height;
-		pTextContainer->get_scrollTop(&top);
+		long height = 0;
 		pTextContainer->get_scrollHeight(&height);
-		pTextContainer->put_scrollTop((long)(scrollPercent * height));
-    } 
+		if (height > 0) {
+			long pos = (long)(scrollPercent * height);
+			if (pos < 0)
+				pos = 0;
+			if (pos > height)
+				pos = height;
+			pTextContainer->put_scrollTop(pos);
+		}
+    }
 }
 void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObject* /*pHint*/)
 {
@@ -172,7 +192,7 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 	if(!(lParam & LPARAM_Update))
 		return;
 	float scrollTop = 0;
-	IDispatch* pDisp =GetHtmlDocument();
+	CComPtr<IDispatch> pDisp = GetHtmlDocument(); // AddRef'd; must not leak
 	
 	if(pSender != NULL){
 		scrollTop = getScrollTop(pDisp);
@@ -189,16 +209,16 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 
 
 
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½×¨ï¿½Ã´ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½
 }
 
 
 void CMarkdownEditorView::initCSS(){
-	string strUserCss = Util::GetExePath() + "user.css";
-	if(PathFileExists(strUserCss.c_str())){
-		_strCSS = Util::ReadStringFile(strUserCss.c_str());
+	const CStringW strUserCss = Util::Utf8ToUtf16((Util::GetExePath() + "user.css").c_str()).c_str();
+	if(PathFileExists(strUserCss)){
+		_strCSS = Util::ReadStringFile(strUserCss);
 	}else{
-		Util::LoadStringRes(IDR_CSS,"CSS",_strCSS); 
+		Util::LoadStringRes(IDR_CSS,_T("CSS"),_strCSS); 
 	}
 }
 
@@ -219,13 +239,55 @@ string&  replaceImgSrc(string& str, string path)
 	}
 	return   str;
 }
-const string HTML_TMPL = "<html><head><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
+const string HTML_TMPL = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
+
+// Raw HTML blocks pass through sundown, so a malicious file could carry a
+// <script> element and MSHTML would execute it inside the preview. Strip
+// script elements before handing the HTML to the browser control. (Links are
+// separately gated by the scheme allowlist in CMyClickEvents::openUrl.)
+static void StripScriptTags(string& html)
+{
+	string::size_type pos = 0;
+	for (;;)
+	{
+		const string::size_type n = html.size();
+		// find the next "<script" (case-insensitive, not a prefix like "<scriptx")
+		string::size_type start = string::npos;
+		for (string::size_type i = html.find('<', pos); i != string::npos && i + 7 <= n;
+			i = html.find('<', i + 1))
+		{
+			if (strnicmp(html.c_str() + i, "<script", 7) == 0
+				&& (i + 7 == n || !isalnum((unsigned char)html[i + 7])))
+			{
+				start = i;
+				break;
+			}
+		}
+		if (start == string::npos)
+			return;
+		// find the closing "</script" and its '>'; strip to the end if absent
+		string::size_type end = n;
+		for (string::size_type i = html.find('<', start + 7); i != string::npos && i + 8 <= n;
+			i = html.find('<', i + 1))
+		{
+			if (strnicmp(html.c_str() + i, "</script", 8) == 0)
+			{
+				string::size_type gt = html.find('>', i + 8);
+				end = (gt == string::npos) ? n : gt + 1;
+				break;
+			}
+		}
+		html.erase(start, end - start);
+		pos = start;
+	}
+}
 
 string CMarkdownEditorView::GetMdHtml(const string& str){
 	string strHtml = HTML_TMPL;
 	Util::ReplaceAllStr(strHtml,"{{0}}", _strCSS);
 	string md = Util::Text2Md(str);
 	md = replaceImgSrc(md, GetDocument()->getFilePath());
+	StripScriptTags(md);
 	Util::ReplaceAllStr(strHtml, "{{1}}", md);
 	return strHtml;
 }

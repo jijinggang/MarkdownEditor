@@ -1,5 +1,5 @@
 
-// MarkdownEditor.cpp : ¶¨ÒåÓ¦ÓÃ³ÌÐòµÄÀàÐÐÎª¡£
+// MarkdownEditor.cpp : ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½
 //
 
 #include "stdafx.h"
@@ -19,39 +19,39 @@
 // CMarkdownEditorApp
 
 BEGIN_MESSAGE_MAP(CMarkdownEditorApp, CWinApp)
-	// »ùÓÚÎÄ¼þµÄ±ê×¼ÎÄµµÃüÁî
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä±ï¿½×¼ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½
 	ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
 END_MESSAGE_MAP()
 
 
-// CMarkdownEditorApp ¹¹Ôì
+// CMarkdownEditorApp ï¿½ï¿½ï¿½ï¿½
 
 CMarkdownEditorApp::CMarkdownEditorApp()
 {
-	// Ö§³ÖÖØÐÂÆô¶¯¹ÜÀíÆ÷
+	// Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART_ASPECTS;
 #ifdef _MANAGED
-	// Èç¹ûÓ¦ÓÃ³ÌÐòÊÇÀûÓÃ¹«¹²ÓïÑÔÔËÐÐÊ±Ö§³Ö(/clr)¹¹½¨µÄ£¬Ôò:
-	//     1) ±ØÐëÓÐ´Ë¸½¼ÓÉèÖÃ£¬¡°ÖØÐÂÆô¶¯¹ÜÀíÆ÷¡±Ö§³Ö²ÅÄÜÕý³£¹¤×÷¡£
-	//     2) ÔÚÄúµÄÏîÄ¿ÖÐ£¬Äú±ØÐë°´ÕÕÉú³ÉË³ÐòÏò System.Windows.Forms Ìí¼ÓÒýÓÃ¡£
+	// ï¿½ï¿½ï¿½Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±Ö§ï¿½ï¿½(/clr)ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½:
+	//     1) ï¿½ï¿½ï¿½ï¿½ï¿½Ð´Ë¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	//     2) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë°´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ System.Windows.Forms ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¡ï¿½
 	System::Windows::Forms::Application::SetUnhandledExceptionMode(System::Windows::Forms::UnhandledExceptionMode::ThrowException);
 #endif
 
-	// TODO: ½«ÒÔÏÂÓ¦ÓÃ³ÌÐò ID ×Ö·û´®Ìæ»»ÎªÎ¨Ò»µÄ ID ×Ö·û´®£»½¨ÒéµÄ×Ö·û´®¸ñÊ½
+	// TODO: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ ID ï¿½Ö·ï¿½ï¿½ï¿½ï¿½æ»»ÎªÎ¨Ò»ï¿½ï¿½ ID ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Ê½
 	//Îª CompanyName.ProductName.SubProduct.VersionInformation
 	SetAppID(_T("MarkdownEditor.AppID.NoVersion"));
 
-	// TODO: ÔÚ´Ë´¦Ìí¼Ó¹¹Ôì´úÂë£¬
-	// ½«ËùÓÐÖØÒªµÄ³õÊ¼»¯·ÅÖÃÔÚ InitInstance ÖÐ
+	// TODO: ï¿½Ú´Ë´ï¿½ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½ï¿½ï¿½ë£¬
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ä³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ InitInstance ï¿½ï¿½
 }
 
-// Î¨Ò»µÄÒ»¸ö CMarkdownEditorApp ¶ÔÏó
+// Î¨Ò»ï¿½ï¿½Ò»ï¿½ï¿½ CMarkdownEditorApp ï¿½ï¿½ï¿½ï¿½
 
 CMarkdownEditorApp theApp;
 
 
-// CMarkdownEditorApp ³õÊ¼»¯
+// CMarkdownEditorApp ï¿½ï¿½Ê¼ï¿½ï¿½
 
 bool IsOSVerWindowsVista()
 {
@@ -75,20 +75,20 @@ BOOL CMarkdownEditorApp::InitInstance()
 		else
 			SetThreadLocale(0x409);
 	}
-	// Èç¹ûÒ»¸öÔËÐÐÔÚ Windows XP ÉÏµÄÓ¦ÓÃ³ÌÐòÇåµ¥Ö¸¶¨Òª
-	// Ê¹ÓÃ ComCtl32.dll °æ±¾ 6 »ò¸ü¸ß°æ±¾À´ÆôÓÃ¿ÉÊÓ»¯·½Ê½£¬
-	//ÔòÐèÒª InitCommonControlsEx()¡£·ñÔò£¬½«ÎÞ·¨´´½¨´°¿Ú¡£
+	// ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Windows XP ï¿½Ïµï¿½Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½åµ¥Ö¸ï¿½ï¿½Òª
+	// Ê¹ï¿½ï¿½ ComCtl32.dll ï¿½æ±¾ 6 ï¿½ï¿½ï¿½ï¿½ß°æ±¾ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½Ó»ï¿½ï¿½ï¿½Ê½ï¿½ï¿½
+	//ï¿½ï¿½ï¿½ï¿½Òª InitCommonControlsEx()ï¿½ï¿½ï¿½ï¿½ï¿½ò£¬½ï¿½ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¡ï¿½
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
-	// ½«ËüÉèÖÃÎª°üÀ¨ËùÓÐÒªÔÚÓ¦ÓÃ³ÌÐòÖÐÊ¹ÓÃµÄ
-	// ¹«¹²¿Ø¼þÀà¡£
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½à¡£
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
 
 
-	// ³õÊ¼»¯ OLE ¿â
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ OLE ï¿½ï¿½
 	if (!AfxOleInit())
 	{
 		AfxMessageBox(IDP_OLE_INIT_FAILED);
@@ -99,60 +99,60 @@ BOOL CMarkdownEditorApp::InitInstance()
 
 	EnableTaskbarInteraction(FALSE);
 
-	// Ê¹ÓÃ RichEdit ¿Ø¼þÐèÒª  AfxInitRichEdit2()	
+	// Ê¹ï¿½ï¿½ RichEdit ï¿½Ø¼ï¿½ï¿½ï¿½Òª  AfxInitRichEdit2()	
 	// AfxInitRichEdit2();
 
-	// ±ê×¼³õÊ¼»¯
-	// Èç¹ûÎ´Ê¹ÓÃÕâÐ©¹¦ÄÜ²¢Ï£Íû¼õÐ¡
-	// ×îÖÕ¿ÉÖ´ÐÐÎÄ¼þµÄ´óÐ¡£¬ÔòÓ¦ÒÆ³ýÏÂÁÐ
-	// ²»ÐèÒªµÄÌØ¶¨³õÊ¼»¯Àý³Ì
-	// ¸ü¸ÄÓÃÓÚ´æ´¢ÉèÖÃµÄ×¢²á±íÏî
-	// TODO: Ó¦ÊÊµ±ÐÞ¸Ä¸Ã×Ö·û´®£¬
-	// ÀýÈçÐÞ¸ÄÎª¹«Ë¾»ò×éÖ¯Ãû
+	// ï¿½ï¿½×¼ï¿½ï¿½Ê¼ï¿½ï¿½
+	// ï¿½ï¿½ï¿½Î´Ê¹ï¿½ï¿½ï¿½ï¿½Ð©ï¿½ï¿½ï¿½Ü²ï¿½Ï£ï¿½ï¿½ï¿½ï¿½Ð¡
+	// ï¿½ï¿½ï¿½Õ¿ï¿½Ö´ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Æ³ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ø¶ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´æ´¢ï¿½ï¿½ï¿½Ãµï¿½×¢ï¿½ï¿½ï¿½ï¿½ï¿½
+	// TODO: Ó¦ï¿½Êµï¿½ï¿½Þ¸Ä¸ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½Îªï¿½ï¿½Ë¾ï¿½ï¿½ï¿½ï¿½Ö¯ï¿½ï¿½
 	SetRegistryKey(_T("MarkdownEditor"));
-	LoadStdProfileSettings(4);  // ¼ÓÔØ±ê×¼ INI ÎÄ¼þÑ¡Ïî(°üÀ¨ MRU)
+	LoadStdProfileSettings(4);  // ï¿½ï¿½ï¿½Ø±ï¿½×¼ INI ï¿½Ä¼ï¿½Ñ¡ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ MRU)
 
 
-	// ×¢²áÓ¦ÓÃ³ÌÐòµÄÎÄµµÄ£°å¡£ÎÄµµÄ£°å
-	// ½«ÓÃ×÷ÎÄµµ¡¢¿ò¼Ü´°¿ÚºÍÊÓÍ¼Ö®¼äµÄÁ¬½Ó
+	// ×¢ï¿½ï¿½Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ä£ï¿½å¡£ï¿½Äµï¿½Ä£ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½Ü´ï¿½ï¿½Úºï¿½ï¿½ï¿½Í¼Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
 		RUNTIME_CLASS(CMarkdownEditorDoc),
-		RUNTIME_CLASS(CMainFrame),       // Ö÷ SDI ¿ò¼Ü´°¿Ú
+		RUNTIME_CLASS(CMainFrame),       // ï¿½ï¿½ SDI ï¿½ï¿½Ü´ï¿½ï¿½ï¿½
 		RUNTIME_CLASS(CLeftView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
 
 
-	// ·ÖÎö±ê×¼ shell ÃüÁî¡¢DDE¡¢´ò¿ªÎÄ¼þ²Ù×÷µÄÃüÁîÐÐ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¼ shell ï¿½ï¿½ï¿½î¡¢DDEï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
-	// ×¢ÊÍµô°ÑMarkdownEditor×÷ÎªmdÎÄµµµÄÄ¬ÈÏ³ÌÐò²Ù×÷
+	// ×¢ï¿½Íµï¿½ï¿½ï¿½MarkdownEditorï¿½ï¿½Îªmdï¿½Äµï¿½ï¿½ï¿½Ä¬ï¿½Ï³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	//EnableShellOpen();
 	//RegisterShellFileTypes(TRUE);
 
 
-	// µ÷¶ÈÔÚÃüÁîÐÐÖÐÖ¸¶¨µÄÃüÁî¡£Èç¹û
-	// ÓÃ /RegServer¡¢/Register¡¢/Unregserver »ò /Unregister Æô¶¯Ó¦ÓÃ³ÌÐò£¬Ôò·µ»Ø FALSE¡£
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½î¡£ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ /RegServerï¿½ï¿½/Registerï¿½ï¿½/Unregserver ï¿½ï¿½ /Unregister ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ò·µ»ï¿½ FALSEï¿½ï¿½
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
 
-	// Î¨Ò»µÄÒ»¸ö´°¿ÚÒÑ³õÊ¼»¯£¬Òò´ËÏÔÊ¾Ëü²¢¶ÔÆä½øÐÐ¸üÐÂ
+	// Î¨Ò»ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¸ï¿½ï¿½ï¿½
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
-	// ½öµ±¾ßÓÐºó×ºÊ±²Åµ÷ÓÃ DragAcceptFiles
-	//  ÔÚ SDI Ó¦ÓÃ³ÌÐòÖÐ£¬ÕâÓ¦ÔÚ ProcessShellCommand Ö®ºó·¢Éú
-	// ÆôÓÃÍÏ/·Å
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðºï¿½×ºÊ±ï¿½Åµï¿½ï¿½ï¿½ DragAcceptFiles
+	//  ï¿½ï¿½ SDI Ó¦ï¿½Ã³ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ ProcessShellCommand Ö®ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½
 	m_pMainWnd->DragAcceptFiles();
 	return TRUE;
 }
 
 int CMarkdownEditorApp::ExitInstance()
 {
-	//TODO: ´¦Àí¿ÉÄÜÒÑÌí¼ÓµÄ¸½¼Ó×ÊÔ´
+	//TODO: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÓµÄ¸ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
 	AfxOleTerm(FALSE);
 
 	return CWinApp::ExitInstance();

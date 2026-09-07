@@ -24,3 +24,5 @@ src/.vs/MarkdownEditor/v15/Browse.VC.db
 download/MarkdownEditor.iobj
 download/MarkdownEditor.ipdb
 src/.vs/MarkdownEditor/v15/Browse.VC.opendb
+.vs/
+Util.i
