@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "Util.h"
-#include "sundown/markdown.h"
-#include "sundown/html.h"
+#include "md4c/md4c.h"
+#include "md4c/md4c-html.h"
 #include <string>
 #include <vector>
 #include <cctype>
@@ -62,31 +62,27 @@ string Util::GetExePath(){
 
 
 
+namespace {
+struct MdOutput {
+	string buf;
+};
+
+void MdOutputCallback(const MD_CHAR* data, MD_SIZE size, void* userdata)
+{
+	static_cast<MdOutput*>(userdata)->buf.append(data, size);
+}
+}
+
 string Util::Text2Md(const string& str){
-#define READ_UNIT 1024
-#define OUTPUT_UNIT 64
-	struct buf *ob;
-	struct sd_callbacks callbacks;
-	struct html_renderopt options;
-	struct sd_markdown *markdown;
-
-	ob = bufnew(OUTPUT_UNIT);
-	// HTML_SAFELINK drops markdown-generated links with non-standard schemes.
-	// Raw HTML blocks still pass through, so openUrl()'s scheme allowlist is
-	// the real security gate; this is defense in depth.
-	sdhtml_renderer(&callbacks, &options, HTML_TOC | HTML_SAFELINK);
-	markdown = sd_markdown_new(MKDEXT_NO_INTRA_EMPHASIS|MKDEXT_TABLES|MKDEXT_AUTOLINK|MKDEXT_FENCED_CODE|MKDEXT_STRIKETHROUGH| MKDEXT_SPACE_HEADERS| MKDEXT_LAX_SPACING, 16, &callbacks, &options);
-
-	sd_markdown_render(ob, (const uint8_t*)(str.c_str()), str.size(), markdown);
-	//sd_markdown_render(ob, ib->data, ib->size, markdown);
-	sd_markdown_free(markdown);
-
-	string strHtml((const char*)ob->data, ob->size);
-
-	/* cleanup */
-	bufrelease(ob);
-
-	return strHtml;
+	// MD_DIALECT_GITHUB = tables + strikethrough + task lists + permissive
+	// autolinks, matching the GFM-style preview CSS. Unlike sundown's
+	// HTML_SAFELINK there is no link scheme filtering here; raw HTML still
+	// passes through, so StripScriptTags and openUrl()'s scheme allowlist
+	// remain the security gates.
+	MdOutput out;
+	md_html(str.c_str(), (MD_SIZE)str.size(), MdOutputCallback, &out,
+		MD_DIALECT_GITHUB, 0);
+	return out.buf;
 }
 
 const int MAX_BUFF = 102400;

@@ -13,7 +13,7 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="sundown">
+    <Filter Include="md4c">
       <UniqueIdentifier>{fbe8a3ec-e5b9-48de-acea-b1ca1b4ace35}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -65,6 +65,15 @@
     <ClInclude Include="MyClickEvents.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="md4c\md4c.h">
+      <Filter>md4c</Filter>
+    </ClInclude>
+    <ClInclude Include="md4c\md4c-html.h">
+      <Filter>md4c</Filter>
+    </ClInclude>
+    <ClInclude Include="md4c\entity.h">
+      <Filter>md4c</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MarkdownEditor.cpp">
@@ -85,32 +94,17 @@
     <ClCompile Include="LeftView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="sundown\autolink.c">
-      <Filter>sundown</Filter>
+    <ClCompile Include="md4c\md4c.c">
+      <Filter>md4c</Filter>
     </ClCompile>
-    <ClCompile Include="sundown\stack.c">
-      <Filter>sundown</Filter>
+    <ClCompile Include="md4c\md4c-html.c">
+      <Filter>md4c</Filter>
     </ClCompile>
-    <ClCompile Include="sundown\markdown.c">
-      <Filter>sundown</Filter>
-    </ClCompile>
-    <ClCompile Include="sundown\buffer.c">
-      <Filter>sundown</Filter>
+    <ClCompile Include="md4c\entity.c">
+      <Filter>md4c</Filter>
     </ClCompile>
     <ClCompile Include="Util.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="sundown\html_smartypants.c">
-      <Filter>sundown</Filter>
-    </ClCompile>
-    <ClCompile Include="sundown\html.c">
-      <Filter>sundown</Filter>
-    </ClCompile>
-    <ClCompile Include="sundown\houdini_html_e.c">
-      <Filter>sundown</Filter>
-    </ClCompile>
-    <ClCompile Include="sundown\houdini_href_e.c">
-      <Filter>sundown</Filter>
     </ClCompile>
     <ClCompile Include="MySplitterWnd.cpp">
       <Filter>源文件</Filter>

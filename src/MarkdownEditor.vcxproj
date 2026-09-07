@@ -114,6 +114,9 @@
     <ClInclude Include="MyClickEvents.h" />
     <ClInclude Include="MySplitterWnd.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="md4c\md4c.h" />
+    <ClInclude Include="md4c\md4c-html.h" />
+    <ClInclude Include="md4c\entity.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Util.h" />
@@ -130,14 +133,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="sundown\autolink.c" />
-    <ClCompile Include="sundown\buffer.c" />
-    <ClCompile Include="sundown\houdini_href_e.c" />
-    <ClCompile Include="sundown\houdini_html_e.c" />
-    <ClCompile Include="sundown\html.c" />
-    <ClCompile Include="sundown\html_smartypants.c" />
-    <ClCompile Include="sundown\markdown.c" />
-    <ClCompile Include="sundown\stack.c" />
+    <ClCompile Include="md4c\md4c.c" />
+    <ClCompile Include="md4c\md4c-html.c" />
+    <ClCompile Include="md4c\entity.c" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
