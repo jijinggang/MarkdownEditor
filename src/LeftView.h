@@ -6,6 +6,7 @@
 #pragma once
 
 class CMarkdownEditorDoc;
+class CMarkdownEditorView;
 
 class CLeftView : public CRichEditView
 {
@@ -43,6 +44,16 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnEnChange();
+	// scroll synchronisation with the preview pane
+	public:
+	long GetFirstVisibleChar();
+	void ScrollEditorToChar(long richChar);
+	private:
+	CMarkdownEditorView* GetPreviewPane();
+	void SyncPreview();
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	UINT _guardTick; // tick of the last preview-driven editor scroll
 	virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };

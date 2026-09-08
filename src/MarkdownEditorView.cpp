@@ -14,6 +14,8 @@
 #include "MarkdownEditorDoc.h"
 #include "MarkdownEditorView.h"
 #include "MyClickEvents.h"
+#include "LeftView.h"
+#include "MdAnchors.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -25,6 +27,8 @@
 IMPLEMENT_DYNCREATE(CMarkdownEditorView, CHtmlView)
 
 BEGIN_MESSAGE_MAP(CMarkdownEditorView, CHtmlView)
+	ON_WM_TIMER()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 // CMarkdownEditorView ����/����
@@ -33,11 +37,25 @@ CMarkdownEditorView::CMarkdownEditorView()
 {
 	// TODO: �ڴ˴����ӹ������
 	_bFirstNavigate = true;
+	_lastTop = 0;
+	_guardTick = 0;
 	initCSS();
 }
 
 CMarkdownEditorView::~CMarkdownEditorView()
 {
+}
+
+void CMarkdownEditorView::OnInitialUpdate()
+{
+	CHtmlView::OnInitialUpdate();
+	SetTimer(IDT_SCROLLSYNC, 120, NULL);
+}
+
+void CMarkdownEditorView::OnDestroy()
+{
+	KillTimer(IDT_SCROLLSYNC);
+	CHtmlView::OnDestroy();
 }
 
 BOOL CMarkdownEditorView::PreCreateWindow(CREATESTRUCT& cs)
@@ -46,12 +64,6 @@ BOOL CMarkdownEditorView::PreCreateWindow(CREATESTRUCT& cs)
 	//  CREATESTRUCT cs ���޸Ĵ��������ʽ
 
 	return CHtmlView::PreCreateWindow(cs);
-}
-
-void CMarkdownEditorView::OnInitialUpdate()
-{
-	CHtmlView::OnInitialUpdate();
-
 }
 
 
@@ -322,8 +334,165 @@ void CMarkdownEditorView::ResolveLocalImages(IHTMLDocument2* pHtmlDoc)
 
 void CMarkdownEditorView::UpdateMd(const string& strMd)
 {
-	string strHtml = GetMdHtml(strMd);
+	// scroll-sync anchors are inserted on the wide (UTF-16) string so the
+	// offsets share units with the RichEdit control's character indices
+	const wstring wsrc = Util::Utf8ToUtf16(strMd.c_str(), (int)strMd.size());
+	wstring wAnchored;
+	MdAnchors::Insert(wsrc, wAnchored, _anchorChars);
+	_anchorRichChars = MdAnchors::ToRichEditOffsets(wsrc, _anchorChars);
+	const string anchored = Util::Utf16ToUtf8(wAnchored.c_str(), (int)wAnchored.size());
+	string strHtml = GetMdHtml(anchored);
 	NavigateHTML(strHtml);
+	CacheAnchorElements();
+}
+
+// collect the live DOM elements for the anchors inserted by MdAnchors::Insert
+void CMarkdownEditorView::CacheAnchorElements()
+{
+	_anchorElems.clear();
+	CComPtr<IDispatch> pDisp = GetHtmlDocument();
+	if (!pDisp)
+		return;
+	CComPtr<IHTMLDocument3> pDoc3;
+	if (FAILED(pDisp->QueryInterface(IID_IHTMLDocument3, (void**)&pDoc3)) || !pDoc3)
+		return;
+	CComPtr<IHTMLElementCollection> pColl;
+	if (FAILED(pDoc3->getElementsByTagName(CComBSTR(L"a"), &pColl)) || !pColl)
+		return;
+	long nCount = 0;
+	if (FAILED(pColl->get_length(&nCount)))
+		return;
+	_anchorElems.resize(_anchorRichChars.size());
+	for (long i = 0; i < nCount; i++) {
+		CComVariant vIndex(i), vZero(0);
+		CComPtr<IDispatch> spDisp;
+		if (FAILED(pColl->item(vIndex, vZero, &spDisp)) || !spDisp)
+			continue;
+		CComPtr<IHTMLElement> pElem;
+		if (FAILED(spDisp->QueryInterface(IID_IHTMLElement, (void**)&pElem)) || !pElem)
+			continue;
+		CComBSTR bId;
+		if (FAILED(pElem->get_id(&bId)) || !bId)
+			continue;
+		const wstring id((LPCWSTR)bId, SysStringLen(bId));
+		if (id.compare(0, 2, L"md") != 0)
+			continue;
+		const int idx = _wtoi(id.c_str() + 2);
+		if (idx >= 0 && idx < (int)_anchorElems.size())
+			_anchorElems[idx] = pElem;
+	}
+}
+
+// absolute Y position (document coordinates) of anchor element idx, -1 if unknown
+long CMarkdownEditorView::AnchorAbsY(int idx)
+{
+	if (idx < 0 || idx >= (int)_anchorElems.size() || !_anchorElems[idx])
+		return -1;
+	CComPtr<IHTMLElement2> pElem2;
+	if (FAILED(_anchorElems[idx]->QueryInterface(IID_IHTMLElement2, (void**)&pElem2)) || !pElem2)
+		return -1;
+	CComPtr<IHTMLRect> pRect;
+	if (FAILED(pElem2->getBoundingClientRect(&pRect)) || !pRect)
+		return -1;
+	long top = 0;
+	if (FAILED(pRect->get_top(&top)))
+		return -1;
+	long scroll = 0;
+	CComPtr<IDispatch> pDisp = GetHtmlDocument();
+	if (pDisp) {
+		CComPtr<IHTMLTextContainer> pText = getContainer(pDisp);
+		if (pText)
+			pText->get_scrollTop(&scroll);
+	}
+	return top + scroll;
+}
+
+CLeftView* CMarkdownEditorView::GetEditorPane()
+{
+	CWnd* pSplitter = GetParent();
+	if (!pSplitter)
+		return NULL;
+	return DYNAMIC_DOWNCAST(CLeftView, ((CSplitterWnd*)pSplitter)->GetPane(0, 0));
+}
+
+// editor scrolled: bring the matching anchor to the top of the preview
+void CMarkdownEditorView::ScrollPreviewToChar(long richChar)
+{
+	if (_anchorRichChars.empty())
+		return;
+	// last anchor at or before richChar
+	int lo = 0, hi = (int)_anchorRichChars.size() - 1;
+	int idx = -1;
+	while (lo <= hi) {
+		const int mid = (lo + hi) / 2;
+		if (_anchorRichChars[mid] <= richChar) {
+			idx = mid;
+			lo = mid + 1;
+		} else {
+			hi = mid - 1;
+		}
+	}
+	if (idx < 0)
+		idx = 0;
+	const long y = AnchorAbsY(idx);
+	if (y < 0)
+		return;
+	CComPtr<IDispatch> pDisp = GetHtmlDocument();
+	if (!pDisp)
+		return;
+	CComPtr<IHTMLTextContainer> pText = getContainer(pDisp);
+	if (!pText)
+		return;
+	_guardTick = GetTickCount();
+	_lastTop = (y > 4) ? (y - 4) : 0;
+	pText->put_scrollTop(_lastTop);
+}
+
+// preview scrolled (timer): scroll the editor to the matching anchor
+void CMarkdownEditorView::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == IDT_SCROLLSYNC)
+		SyncFromPreview();
+	CView::OnTimer(nIDEvent);
+}
+
+void CMarkdownEditorView::SyncFromPreview()
+{
+	CComPtr<IDispatch> pDisp = GetHtmlDocument();
+	if (!pDisp)
+		return;
+	CComPtr<IHTMLTextContainer> pText = getContainer(pDisp);
+	if (!pText)
+		return;
+	long top = 0;
+	if (FAILED(pText->get_scrollTop(&top)))
+		return;
+	if (top == _lastTop)
+		return;
+	_lastTop = top;
+	const UINT now = GetTickCount();
+	if (now - _guardTick < 250)
+		return; // this change was caused by our own editor-driven sync
+	const int n = (int)_anchorRichChars.size();
+	if (n == 0)
+		return;
+	// last anchor at or above the viewport top (layout shifts when images
+	// finish loading, so positions are computed fresh each time)
+	int best = 0;
+	long bestY = -1;
+	for (int i = 0; i < n; i++) {
+		const long y = AnchorAbsY(i);
+		if (y < 0)
+			continue;
+		if (y <= top + 1 && y >= bestY) {
+			bestY = y;
+			best = i;
+		}
+	}
+	CLeftView* pEdit = GetEditorPane();
+	if (!pEdit)
+		return;
+	pEdit->ScrollEditorToChar(_anchorRichChars[best]);
 }
 
 

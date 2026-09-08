@@ -4,7 +4,9 @@
 
 #pragma once
 #include <string>
+#include <vector>
 using namespace std;
+class CLeftView;
 
 class CMarkdownEditorView : public CHtmlView
 {
@@ -16,6 +18,23 @@ private:
 	void setClickEvents(IHTMLDocument2* htmlDocument2);
 	string GetMdHtml(const string& str);
 	void ResolveLocalImages(IHTMLDocument2* pHtmlDoc);
+
+// scroll synchronisation between editor and preview
+	static const UINT_PTR IDT_SCROLLSYNC = 1;
+	void CacheAnchorElements();
+	long AnchorAbsY(int idx);
+	CLeftView* GetEditorPane();
+	public:
+	void ScrollPreviewToChar(long richChar);
+	private:
+	void SyncFromPreview();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
+	std::vector<size_t> _anchorChars;   // wide-string offsets from MdAnchors
+	std::vector<long> _anchorRichChars; // same anchors in RichEdit indices
+	std::vector<CComPtr<IHTMLElement> > _anchorElems; // live DOM anchors
+	long _lastTop;       // preview scrollTop seen by the last sync tick
+	UINT _guardTick;     // tick of the last editor-driven preview scroll
 public:
 	void UpdateMd(const string& strMd);
 

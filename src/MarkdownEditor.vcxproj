@@ -108,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="LeftView.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MdAnchors.h" />
     <ClInclude Include="MarkdownEditor.h" />
     <ClInclude Include="MarkdownEditorDoc.h" />
     <ClInclude Include="MarkdownEditorView.h" />
@@ -124,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="LeftView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MdAnchors.cpp" />
     <ClCompile Include="MarkdownEditor.cpp" />
     <ClCompile Include="MarkdownEditorDoc.cpp" />
     <ClCompile Include="MarkdownEditorView.cpp" />

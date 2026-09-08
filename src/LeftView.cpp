@@ -8,9 +8,15 @@
 #include "MarkdownEditorDoc.h"
 #include "LeftView.h"
 #include "./Util.h"
+#include "MarkdownEditorView.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#endif
+
+#ifndef EM_SETSCROLLPOS
+#define EM_SETSCROLLPOS (WM_USER + 224)
 #endif
 
 
@@ -20,6 +26,8 @@ IMPLEMENT_DYNCREATE(CLeftView, CRichEditView)
 
 BEGIN_MESSAGE_MAP(CLeftView, CRichEditView)
 	ON_CONTROL_REFLECT(EN_CHANGE, &CLeftView::OnEnChange)
+	ON_WM_VSCROLL()
+	ON_WM_MOUSEWHEEL()
 	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
@@ -28,6 +36,7 @@ END_MESSAGE_MAP()
 
 CLeftView::CLeftView()
 {
+	_guardTick = 0;
 	// TODO: 在此处添加构造代码
 }
 
@@ -108,6 +117,62 @@ void CLeftView::OnUpdate(CView* pSender, LPARAM lHint, CObject* /*pHint*/)
 		CStringW strText = Util::Utf8ToUtf16(GetDocument()->getText().c_str()).c_str();
 		GetRichEditCtrl().SetWindowText(strText);
 	}
+}
+
+CMarkdownEditorView* CLeftView::GetPreviewPane()
+{
+	CWnd* pSplitter = GetParent();
+	if (!pSplitter)
+		return NULL;
+	return DYNAMIC_DOWNCAST(CMarkdownEditorView, ((CSplitterWnd*)pSplitter)->GetPane(0, 1));
+}
+
+// character index (RichEdit units) nearest to the top-left of the view
+long CLeftView::GetFirstVisibleChar()
+{
+	long idx = GetRichEditCtrl().CharFromPos(CPoint(1, 1));
+	const int len = GetRichEditCtrl().GetTextLength();
+	if (idx > len)
+		idx = len;
+	return idx;
+}
+
+// preview scrolled: scroll here without moving the caret or selection
+void CLeftView::ScrollEditorToChar(long richChar)
+{
+	CRichEditCtrl& rc = GetRichEditCtrl();
+	const int len = rc.GetTextLength();
+	if (richChar < 0)
+		richChar = 0;
+	if (richChar > len)
+		richChar = len;
+	CPoint ptPos = rc.PosFromChar((int)richChar);
+	CPoint ptScroll(0, ptPos.y > 0 ? ptPos.y : 0);
+	_guardTick = GetTickCount();
+	rc.SendMessage(EM_SETSCROLLPOS, 0, (LPARAM)&ptScroll);
+}
+
+void CLeftView::SyncPreview()
+{
+	if (GetTickCount() - _guardTick < 250)
+		return; // this scroll was caused by our own preview-driven sync
+	CMarkdownEditorView* pPreview = GetPreviewPane();
+	if (!pPreview)
+		return;
+	pPreview->ScrollPreviewToChar(GetFirstVisibleChar());
+}
+
+void CLeftView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	Default(); // let the rich edit control perform the actual scrolling
+	SyncPreview();
+}
+
+BOOL CLeftView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	const BOOL res = CRichEditView::OnMouseWheel(nFlags, zDelta, pt);
+	SyncPreview();
+	return res;
 }
 
 int CLeftView::OnCreate(LPCREATESTRUCT lpCreateStruct)
