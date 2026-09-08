@@ -159,7 +159,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 	}
 
 
-	const string STR_ABOUT = "# MarkdownEditor 1.2\nProject: <https://github.com/jijinggang/MarkdownEditor>\n## Author\njijinggang@gmail.com\n## Copyright\nFree For All";
+	const string STR_ABOUT = "# MarkdownEditor\nProject: <https://github.com/jijinggang/MarkdownEditor>\n## Author\njijinggang@gmail.com\n## Copyright\nFree For All";
 	//ע�⣬����Ӧ�����������MainFrame�У��������MarkdownEditorView�У����MarkdownEditorViewʧȥ���㣬��˵����ܵ�
 	void CMainFrame::OnAbout()
 	{
