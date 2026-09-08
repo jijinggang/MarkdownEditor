@@ -133,6 +133,7 @@ void CMarkdownEditorView::NavigateHTML(const string& strHtml)
 		SafeArrayDestroy(psaStrings);
 		pHtmlDoc->close();
 	}
+	ResolveLocalImages(pHtmlDoc);
 }
 
 CComPtr<IHTMLTextContainer> getContainer(IDispatch* pDisp){
@@ -222,23 +223,6 @@ void CMarkdownEditorView::initCSS(){
 	}
 }
 
-string&  replaceImgSrc(string& str, string path)
-{
-	if (path.size() == 0)
-		return str;
-	string old_value = "<img src=\"";
-	string new_value = "<img src=\"" + path;
-	for (string::size_type pos(0); pos != string::npos; pos += old_value.length())   {
-		if ((pos = str.find(old_value, pos)) != string::npos){
-			const char* start = str.c_str() + pos + old_value.length();
-			if (strnicmp(start, "http://", 7) != 0 && strnicmp(start, "https://", 8) != 0)
-				str.replace(pos, old_value.length(), new_value);
-		}
-		else   
-			break;
-	}
-	return   str;
-}
 const string HTML_TMPL = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><style type=\"text/css\">{{0}}</style></head><body>{{1}}</body></html>";
 
 // Raw HTML blocks pass through sundown, so a malicious file could carry a
@@ -286,10 +270,54 @@ string CMarkdownEditorView::GetMdHtml(const string& str){
 	string strHtml = HTML_TMPL;
 	Util::ReplaceAllStr(strHtml,"{{0}}", _strCSS);
 	string md = Util::Text2Md(str);
-	md = replaceImgSrc(md, GetDocument()->getFilePath());
 	StripScriptTags(md);
 	Util::ReplaceAllStr(strHtml, "{{1}}", md);
 	return strHtml;
+}
+
+// The preview document lives at about:blank, so relative <img src> values
+// cannot resolve on their own. Rewriting the generated HTML instead (the old
+// replaceImgSrc) would bake absolute paths into the document source, which is
+// what right-click "View Source" offers for saving. Keep the written stream
+// portable (relative paths only) and fix up the live DOM here: assigning the
+// absolute URL to IHTMLImgElement::put_src triggers the actual image load.
+void CMarkdownEditorView::ResolveLocalImages(IHTMLDocument2* pHtmlDoc)
+{
+	const string& dir = GetDocument()->getFilePath(); // UTF-8, forward slashes, trailing '/'
+	if (dir.empty())
+		return;
+	CComPtr<IHTMLElementCollection> spImages;
+	if (FAILED(pHtmlDoc->get_images(&spImages)) || !spImages)
+		return;
+	long nCount = 0;
+	if (FAILED(spImages->get_length(&nCount)))
+		return;
+	for (long i = 0; i < nCount; i++) {
+		CComVariant vIndex(i), vZero(0);
+		CComPtr<IDispatch> spDisp;
+		if (FAILED(spImages->item(vIndex, vZero, &spDisp)) || !spDisp)
+			continue;
+		CComPtr<IHTMLImgElement> spImg;
+		if (FAILED(spDisp->QueryInterface(IID_IHTMLImgElement, (void**)&spImg)) || !spImg)
+			continue;
+		// NB: MSHTML resolves URL attributes on read, so an unresolvable
+		// relative src comes back as "about:<relpath>" here (the document
+		// itself lives at about:blank)
+		CComBSTR bSrc;
+		if (FAILED(spImg->get_src(&bSrc)) || !bSrc)
+			continue;
+		string raw = Util::Utf16ToUtf8(bSrc, SysStringLen(bSrc));
+		if (raw.compare(0, 6, "about:") == 0)
+			raw = raw.substr(6);
+		if (raw.empty() || raw == "blank")
+			continue;
+		// leave anything that already carries a scheme (http:, file:, data:,
+		// "c:/..." drive paths) untouched
+		if (raw.find(':') != string::npos)
+			continue;
+		const string url = "file:///" + dir + raw;
+		spImg->put_src(CComBSTR(Util::Utf8ToUtf16(url.c_str(), (int)url.size()).c_str()));
+	}
 }
 
 void CMarkdownEditorView::UpdateMd(const string& strMd)

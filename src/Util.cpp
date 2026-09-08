@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 #include <cctype>
-#include <algorithm>  
+#include <string.h>
+#include <algorithm>
 
 using namespace std;
 Util::Util(void)
@@ -73,6 +74,41 @@ void MdOutputCallback(const MD_CHAR* data, MD_SIZE size, void* userdata)
 }
 }
 
+// md4c percent-escapes every byte >= 0x80 in link/image URLs (its URL escape
+// map only allows ASCII alphanumerics and a few punctuation characters), so
+// "<img src=CN_DIR/a.png>" comes out as "%E5%9B%BE...". MSHTML decodes %XX with
+// the system ANSI code page rather than UTF-8, so the file would not be found
+// on non-ASCII paths. Decode the escapes whose byte value is >= 0x80 back to
+// raw UTF-8. ASCII escapes (%20 etc.) are left alone, and '%' itself is never
+// produced by md4c's escaper, so literal "%XX" in the source text survives.
+static void DecodeNonAsciiUrlEscapes(string& s)
+{
+    static const char hex[] = "0123456789ABCDEF";
+    string out;
+    out.reserve(s.size());
+    string::size_type i = 0;
+    const string::size_type n = s.size();
+    while (i < n) {
+        const unsigned char c = (unsigned char)s[i];
+        if (c == '%' && i + 2 < n) {
+            const char* hi = strchr(hex, toupper((unsigned char)s[i + 1]));
+            const char* lo = strchr(hex, toupper((unsigned char)s[i + 2]));
+            // strchr(hex,'\0') would find the terminator; guard against NUL bytes
+            if (hi != NULL && lo != NULL && s[i + 1] != '\0' && s[i + 2] != '\0') {
+                const unsigned char byte = (unsigned char)((hi - hex) * 16 + (lo - hex));
+                if (byte >= 0x80) {
+                    out += (char)byte;
+                    i += 3;
+                    continue;
+                }
+            }
+        }
+        out += s[i];
+        i++;
+    }
+    s.swap(out);
+}
+
 string Util::Text2Md(const string& str){
 	// MD_DIALECT_GITHUB = tables + strikethrough + task lists + permissive
 	// autolinks, matching the GFM-style preview CSS. Unlike sundown's
@@ -82,6 +118,7 @@ string Util::Text2Md(const string& str){
 	MdOutput out;
 	md_html(str.c_str(), (MD_SIZE)str.size(), MdOutputCallback, &out,
 		MD_DIALECT_GITHUB, 0);
+	DecodeNonAsciiUrlEscapes(out.buf);
 	return out.buf;
 }
 

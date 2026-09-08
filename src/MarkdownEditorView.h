@@ -15,6 +15,7 @@ private:
 	void initCSS();
 	void setClickEvents(IHTMLDocument2* htmlDocument2);
 	string GetMdHtml(const string& str);
+	void ResolveLocalImages(IHTMLDocument2* pHtmlDoc);
 public:
 	void UpdateMd(const string& strMd);
 
