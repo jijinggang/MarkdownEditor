@@ -219,6 +219,14 @@ void CMarkdownEditorView::OnUpdate(CView* pSender, LPARAM /*lHint*/lParam, CObje
 	if(pSender != NULL){
 		setScrollTop(pDisp,scrollTop);
 	}
+	// record the restored position so the sync timer does not mistake this
+	// programmatic repositioning for a user preview scroll
+	CComPtr<IHTMLTextContainer> pText = getContainer(pDisp);
+	if (pText) {
+		long top = 0;
+		if (SUCCEEDED(pText->get_scrollTop(&top)))
+			_lastTop = top;
+	}
 
 
 
@@ -470,6 +478,10 @@ void CMarkdownEditorView::SyncFromPreview()
 	if (top == _lastTop)
 		return;
 	_lastTop = top;
+	// the user is editing: never move the editor scrollbar from here
+	CLeftView* pEdit = GetEditorPane();
+	if (pEdit && pEdit->GetRichEditCtrl().GetSafeHwnd() == ::GetFocus())
+		return;
 	const UINT now = GetTickCount();
 	if (now - _guardTick < 250)
 		return; // this change was caused by our own editor-driven sync
@@ -489,7 +501,6 @@ void CMarkdownEditorView::SyncFromPreview()
 			best = i;
 		}
 	}
-	CLeftView* pEdit = GetEditorPane();
 	if (!pEdit)
 		return;
 	pEdit->ScrollEditorToChar(_anchorRichChars[best]);
